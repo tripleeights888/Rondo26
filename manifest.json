@@ -1,0 +1,15 @@
+{
+  "name": "Panini Trade Manager",
+  "short_name": "Panini Trade",
+  "description": "FIFA World Cup 2026 Panini sticker collection and trade tracker",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0c1c2e",
+  "theme_color": "#173E69",
+  "icons": [
+    { "src": "./icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "./icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
