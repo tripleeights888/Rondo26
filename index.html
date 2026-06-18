@@ -8,9 +8,9 @@
 <link rel="apple-touch-icon" href="./apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Panini Trade">
+<meta name="apple-mobile-web-app-title" content="Rondo">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Panini Trade Manager</title>
+<title>Rondo - World Cup Sticker Tracker</title>
 <style>
   :root{
     /* Argentina national team palette */
@@ -32,6 +32,20 @@
   /* progress bars */
   .progress-wrap{padding:0 4px 4px;}
   .prog-overall{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:11px 13px;margin-bottom:12px;}
+  .cdot{display:inline-block;width:9px;height:9px;border-radius:50%;border:1px solid rgba(255,255,255,0.35);flex:0 0 auto;margin-right:3px;vertical-align:middle;}
+  .chip .cdot{position:absolute;top:5px;right:6px;width:8px;height:8px;margin:0;}
+  .chip.have{position:relative;}
+  .cbreak{margin-top:11px;border-top:1px solid var(--line);padding-top:10px;}
+  .cbreak-title{font-size:0.66rem;font-weight:800;letter-spacing:0.04em;text-transform:uppercase;color:var(--gold);margin-bottom:7px;}
+  .cbreak-list{display:flex;flex-wrap:wrap;gap:9px;}
+  .cbreak-item{font-size:0.72rem;color:var(--chalk-dim);display:flex;align-items:center;gap:2px;}
+  .cbreak-item b{color:var(--chalk);font-weight:800;}
+  .cpick{margin-top:11px;}
+  .cpick-label{font-size:0.66rem;font-weight:800;letter-spacing:0.04em;text-transform:uppercase;opacity:0.85;}
+  .cswatches{display:flex;flex-wrap:wrap;gap:7px;margin-top:7px;}
+  .cswatch{width:30px;height:30px;border-radius:8px;border:2px solid rgba(255,255,255,0.25);cursor:pointer;padding:0;position:relative;}
+  .cswatch.on{border-color:var(--gold);box-shadow:0 0 0 2px rgba(213,176,72,0.4);}
+  .cswatch.on::after{content:'✓';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:0.85rem;font-weight:800;text-shadow:0 0 3px rgba(0,0,0,0.8);}
   .prog-overall .plabel{display:flex;justify-content:space-between;align-items:baseline;font-size:0.78rem;font-weight:700;margin-bottom:7px;}
   .prog-overall .ppct{color:var(--gold);}
   .bar{height:8px;border-radius:99px;background:rgba(0,0,0,0.4);overflow:hidden;}
@@ -47,6 +61,16 @@
   .qa-input-row input{flex:1;font-size:1.1rem;padding:12px 14px;border-radius:9px;border:2px solid var(--line);background:rgba(0,0,0,0.4);color:var(--chalk);font-weight:700;text-transform:uppercase;outline:none;}
   .qa-input-row input:focus{border-color:var(--gold);}
   .qa-input-row button{font-size:0.9rem;font-weight:800;padding:0 18px;border-radius:9px;border:none;background:var(--gold);color:#1a1303;cursor:pointer;}
+  .qa-team-row{display:flex;align-items:center;gap:10px;margin-bottom:9px;}
+  .qa-team-row input{flex:0 0 auto;width:130px;font-size:1.1rem;padding:12px 14px;border-radius:9px;border:2px solid var(--line);background:rgba(0,0,0,0.4);color:var(--chalk);font-weight:800;text-transform:uppercase;outline:none;}
+  .qa-team-row input:focus{border-color:var(--gold);}
+  .qa-teamname{font-size:0.85rem;font-weight:700;}
+  .qa-teamname.ok{color:var(--have);}
+  .qa-teamname.bad{color:var(--need);}
+  .qa-nums-row{display:flex;gap:8px;}
+  .qa-nums-row input{flex:1;font-size:1.1rem;padding:12px 14px;border-radius:9px;border:2px solid var(--line);background:rgba(0,0,0,0.4);color:var(--chalk);font-weight:700;outline:none;}
+  .qa-nums-row input:focus{border-color:var(--gold);}
+  .qa-nums-row button{font-size:0.88rem;font-weight:800;padding:0 16px;border-radius:9px;border:none;background:var(--gold);color:#1a1303;cursor:pointer;white-space:nowrap;}
   .qa-feedback{margin-top:12px;min-height:54px;}
   .qa-card{border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:2px;}
   .qa-card .qwho{font-size:0.72rem;text-transform:uppercase;letter-spacing:0.05em;opacity:0.85;}
@@ -59,6 +83,12 @@
   .qa-card.dupe .qwhat{color:#9ed3f0;}
   .qa-card.bad{background:#2e1413;border:2px solid var(--need);}
   .qa-card.bad .qwhat{color:#ff8f8b;}
+  .qa-card.sum{background:var(--card);border:2px solid var(--gold);}
+  .qa-sumline{font-size:0.82rem;margin-top:5px;line-height:1.35;}
+  .qa-sumline.new{color:#9ad8a3;}
+  .qa-sumline.dupe{color:#9ed3f0;}
+  .qa-sumline.bad{color:#ff8f8b;}
+  .qa-sumline b{font-weight:800;}
   .qa-recent{margin-top:14px;font-size:0.74rem;color:#88a3bb;}
   .qa-recent b{color:var(--chalk);}
   /* compare results */
@@ -179,11 +209,12 @@
   .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:var(--gold);color:var(--ink);font-weight:800;font-size:0.85rem;padding:11px 18px;border-radius:99px;z-index:200;opacity:0;transition:opacity .2s;pointer-events:none;box-shadow:0 6px 18px rgba(0,0,0,0.4);}
   .toast.show{opacity:1;}
   footer{text-align:center;font-size:0.68rem;color:#5a6b5e;margin-top:20px;padding:0 18px;}
+  .disclaimer{font-size:0.62rem;color:#4a5868;line-height:1.6;display:inline-block;max-width:340px;}
 </style>
 </head>
 <body>
 <header>
-  <h1>Panini Trade Manager <span class="badge">WC 26</span></h1>
+  <h1>Rondo <span class="badge">WC 26</span></h1>
   <div class="sub">Search a code, number, or player. Tap a sticker, then act.</div>
   <div class="toolbar">
     <button class="tbtn tbtn-accent" onclick="openModal('quickadd')">+ Quick add</button>
@@ -197,16 +228,16 @@
     <input id="search" type="text" inputmode="text" autocomplete="off" oninput="lookup(this.value)" placeholder="Try: salah · EGY 17 · messi · tur 16">
     <button id="clearBtn" class="clear-btn" onclick="clearSearch()" aria-label="Clear search">&times;</button>
   </div>
-  <div class="hint">Green = give · Red = need · Blue = have. Changes save on this device.</div>
+  <div class="hint">Green = trade · Red = want · Blue = stick it. Changes save on this device.</div>
   <div id="hdr-progress" class="hdr-progress"></div>
 </header>
 
 <div id="result"></div>
 
 <div class="tabs">
-  <div id="tab-give" class="tab give active" onclick="switchTab('give')">GIVE<span class="n" id="cnt-give">110</span></div>
-  <div id="tab-need" class="tab need" onclick="switchTab('need')">NEED<span class="n" id="cnt-need">579</span></div>
-  <div id="tab-have" class="tab have" onclick="switchTab('have')">HAVE<span class="n" id="cnt-have">413</span></div>
+  <div id="tab-give" class="tab give active" onclick="switchTab('give')">TRADE<span class="n" id="cnt-give">110</span></div>
+  <div id="tab-need" class="tab need" onclick="switchTab('need')">WANT<span class="n" id="cnt-need">579</span></div>
+  <div id="tab-have" class="tab have" onclick="switchTab('have')">STICK IT!<span class="n" id="cnt-have">413</span></div>
 </div>
 
 <div class="panel" id="panel-give"></div>
@@ -219,7 +250,7 @@
   <button class="bulk-cancel" onclick="exitSelectMode()">Done</button>
 </div>
 
-<footer>Tap a sticker for a verdict and action. Give marks a dupe as traded; Got it moves a need into your collection. Export often so you do not lose changes.</footer>
+<footer>Tap a sticker for a verdict and action. Trade marks a dupe as traded; Got it moves a want into your collection. Export often so you do not lose changes.<br><br><span class="disclaimer">Rondo is an unofficial fan-made tracker. Not affiliated with or endorsed by Panini or FIFA. All trademarks belong to their respective owners.</span></footer>
 
 <div class="modal" id="modal">
   <div class="modal-card">
@@ -244,6 +275,34 @@ var BASE={
   have:{"MEX":[3,5,6,8,9,10,11,12,14,18,19,20],"RSA":[3,5,8,11,12,13,14,15,16,18],"KOR":[2,3,6,7,10,11],"CZE":[9,15,17,18],"CAN":[3,5,8,10,16,18],"BIH":[2,3,4,5,6,7,10,12,17,20],"QAT":[1,4,6,10,11,18],"SUI":[1,2,3,4,6,7,11,15,20],"BRA":[2,3,4,5,6,7,10,13,14,17,20],"MAR":[1,4,5,12,15,19],"HAI":[3,6,7,9,10,11,12,16,17,19,20],"SCO":[1,2,8,10,12,13,18,19],"USA":[2,4,5,7,9,10,11,12,14,17,20],"PAR":[1,3,4,5,6,11,12,13,16,19],"AUS":[2,5,8,9,11,13,14,17,19],"TUR":[2,4,6,7,10,14,16],"GER":[4,5,6,9,15,16],"CUW":[1,2,3,4,5,6,7,8,9,10,11,12,14,16,18],"CIV":[1,2,4,5,6,7,10,11,12,13,15,19,20],"ECU":[4,6,7,8,9,10,13,16],"NED":[2,6,7,15,16,18,19],"JPN":[1,7,8,12,13,18],"SWE":[13,15,16,18,19],"TUN":[1,5,6,7,8,10,13,16,18,19],"BEL":[6,9,11,12,13,14,18,19],"EGY":[8,9,10,11,12,13,17,19,20],"IRN":[2,4,5,7,9,15,17,19],"NZL":[2,3,5,8,12,14,15,16],"ESP":[1,2,6,9,11,12,13,18],"CPV":[4,9,10,11,12,15,16,17],"KSA":[1,4,5,7,9,11,13,18],"URU":[1,2,4,6,7,9,10,11,12,17,18,19],"FRA":[9,12,13,14,17,19,20],"SEN":[2,3,5,7,8,11,12,14,18,19,20],"IRQ":[3,6,9,15,16,19,20],"NOR":[2,3,4,5,6,8,10,11,17,18],"ARG":[1,2,3,7,8,9,10,13],"ALG":[12,14,15,16,17,18,19],"AUT":[3,6,7,9,10,12,17],"JOR":[2,5,8,9,11,12,13,14,15,16,17],"POR":[4,5,8,11,12,14,16,18,20],"COD":[2,3,6,7,11,16,17],"UZB":[1,5,6,7,9,11,12,20],"COL":[2,3,4,5,7,8,16,19],"ENG":[1,2,8,11,14,15,16,18,19,20],"CRO":[1,4,8,9,12,16,17,18,19],"GHA":[1,6,7,13,14,16,20],"PAN":[2,8,9,11,12,16,17],"INTRO":[1,3,5],"MUSEUM":[12],"CC":[],"LOGO":["00"]}
 };
 var STORE_KEY='panini_wc26_state_v1';
+
+// Sticker rarity colors. key -> {label, dot color}. 'white' is the default base.
+var COLORS={
+  white:{label:'White (Base)',c:'#e8e8e8'},
+  blue:{label:'Blue',c:'#4a90d9'},
+  red:{label:'Red',c:'#d9534f'},
+  purple:{label:'Purple',c:'#9b59b6'},
+  green:{label:'Green',c:'#3fae5a'},
+  black:{label:'Black (1-of-1)',c:'#222222'},
+  orange:{label:'Orange (Amazon)',c:'#e8862a'},
+  crumple:{label:'Crumple foil',c:'#c0c0c0'},
+  goldcrumple:{label:'Gold Flood Crumple',c:'#d5b048'},
+  bronze:{label:'Bronze Extra',c:'#a9702e'},
+  silver:{label:'Silver Extra',c:'#b8c0c8'},
+  gold:{label:'Gold Extra',c:'#d5b048'}
+};
+var COLOR_ORDER=['white','blue','red','purple','green','black','orange','crumple','goldcrumple','bronze','silver','gold'];
+function colorOf(code,val){
+  if(state.colors&&state.colors[code]&&state.colors[code][val])return state.colors[code][val];
+  return 'white';
+}
+function setColor(code,val,key){
+  if(!state.colors)state.colors={};
+  if(!state.colors[code])state.colors[code]={};
+  if(key==='white')delete state.colors[code][val]; // white is default, don't store
+  else state.colors[code][val]=key;
+  saveState();
+}
 
 // Official 2026 World Cup group assignments, mapped to sticker codes.
 var GROUPS={
@@ -294,9 +353,9 @@ function clone(o){return JSON.parse(JSON.stringify(o));}
 function loadState(){
   try{
     var raw=(typeof localStorage!=='undefined')?localStorage.getItem(STORE_KEY):null;
-    if(raw){var p=JSON.parse(raw); if(p&&p.dupes&&p.wants&&p.have){if(!p.given)p.given={};if(!p.favs)p.favs={};return p;}}
+    if(raw){var p=JSON.parse(raw); if(p&&p.dupes&&p.wants&&p.have){if(!p.given)p.given={};if(!p.favs)p.favs={};if(!p.colors)p.colors={};return p;}}
   }catch(e){}
-  return {dupes:clone(BASE.dupes),wants:clone(BASE.wants),have:clone(BASE.have),given:{},favs:{},log:[]};
+  return {dupes:clone(BASE.dupes),wants:clone(BASE.wants),have:clone(BASE.have),given:{},favs:{},colors:{},log:[]};
 }
 function saveState(){
   try{ if(typeof localStorage!=='undefined'){localStorage.setItem(STORE_KEY,JSON.stringify(state));} }catch(e){}
@@ -374,8 +433,13 @@ function chipHTML(code,val,kind,cnt){
   }
   var label2=String(val);
   var nameHtml2=nm?('<span class="cname">'+nm.replace(/"/g,'&quot;')+'</span>'):'';
+  var dot='';
+  if(kind==='have'){
+    var col=colorOf(code,val);
+    if(col!=='white'){dot='<span class="cdot" style="background:'+COLORS[col].c+'" title="'+COLORS[col].label+'"></span>';}
+  }
   return '<span class="chip '+kind+'" data-name="'+nm.toLowerCase().replace(/"/g,'')+'" '+
-    'onclick="chipTap(event,\''+code+'\',\''+val+'\')"><span class="cnum">'+label2+'</span>'+nameHtml2+'</span>';
+    'onclick="chipTap(event,\''+code+'\',\''+val+'\')">'+dot+'<span class="cnum">'+label2+'</span>'+nameHtml2+'</span>';
 }
 function teamBlockHTML(code,items,kind){
   var order,m=null,chips='';
@@ -394,7 +458,7 @@ function teamBlockHTML(code,items,kind){
     var avail=count-givenHere;
     label=avail+' spare'+(avail!==1?'s':'')+(givenHere>0?(' · '+givenHere+' given'):'');
   }else{
-    label=(kind==='need')?(count+' needed'):(count+' owned');
+    label=(kind==='need')?(count+' wanted'):(count+' owned');
   }
   var progBar='';
   var pctTag='';
@@ -411,11 +475,29 @@ function teamBlockHTML(code,items,kind){
     starBtn+'<span class="team-code">'+code+'</span><span class="team-count">'+label+'</span>'+pctTag+'</div>'+
     '<div class="chips">'+chips+'</div>'+progBar+'</div>';
 }
+function colorBreakdownHTML(){
+  var counts={};for(var i=0;i<COLOR_ORDER.length;i++)counts[COLOR_ORDER[i]]=0;
+  for(var code in state.have){
+    for(var j=0;j<state.have[code].length;j++){
+      var v=state.have[code][j];
+      var col=colorOf(code,v);counts[col]=(counts[col]||0)+1;
+    }
+  }
+  var parts=[];
+  for(var k=0;k<COLOR_ORDER.length;k++){
+    var ck=COLOR_ORDER[k];
+    if(counts[ck]>0||ck==='white'){
+      parts.push('<span class="cbreak-item"><span class="cdot" style="background:'+COLORS[ck].c+'"></span>'+
+        COLORS[ck].label.replace(/ \(.*\)/,'')+' <b>'+counts[ck]+'</b></span>');
+    }
+  }
+  return '<div class="cbreak"><div class="cbreak-title">Color tiers</div><div class="cbreak-list">'+parts.join('')+'</div></div>';
+}
 function renderPanel(kind){
   var data=(kind==='give')?state.dupes:(kind==='need')?state.wants:state.have;
   var note=(kind==='give')?'My duplicates - tap to trade one away.':
-           (kind==='need')?'Stickers I still need. Tap when you get one.':
-           'Everything I own (full set minus needs).';
+           (kind==='need')?'Stickers I want. Tap when you get one.':
+           'Everything I own (full set minus wants).';
   var html='<div class="filter-note">'+note+'</div>';
   // Overall completion bar on the Have tab.
   if(kind==='have'){
@@ -424,7 +506,8 @@ function renderPanel(kind){
     html+='<div class="progress-wrap"><div class="prog-overall">'+
       '<div class="plabel"><span>Album completion</span>'+
       '<span class="ppct">'+ov.owned+' / '+ov.full+' · '+opct+'%</span></div>'+
-      '<div class="bar"><span style="width:'+opct+'%"></span></div></div></div>';
+      '<div class="bar"><span style="width:'+opct+'%"></span></div></div>'+
+      colorBreakdownHTML()+'</div>';
   }
   var any=false;
   // Walk the official group order, printing a heading then each team that has stickers.
@@ -526,27 +609,41 @@ function showVerdict(code,val){
   var nm=nameFor(code,val);
   var cls,who,detail,actions='';
   if(give>0){
-    cls='give';who='You can GIVE this';
+    cls='give';who='You can TRADE this';
     var givenN=givenCount(code,val);
     var avail=give-givenN;
     if(avail>0){
-      detail=(give>1?('You have '+avail+' of '+give+' spares left to give.'):'You have 1 spare.');
-      actions='<button class="vbtn do-give" onclick="actGive()">Give it away</button>';
+      detail=(give>1?('You have '+avail+' of '+give+' spares left to trade.'):'You have 1 spare.');
+      actions='<button class="vbtn do-give" onclick="actGive()">Trade it away</button>';
       if(givenN>0)actions+='<button class="vbtn do-undo" onclick="actUndoGive()">Undo last</button>';
       actions+='<button class="vbtn do-remove" onclick="actRemoveDupe()">Remove spare (mistake)</button>';
     }else{
-      cls='given-v';who='Already given away';
+      cls='given-v';who='Already traded away';
       detail='You traded all '+give+' spare'+(give>1?'s':'')+' of this.';
       actions='<button class="vbtn do-undo" onclick="actUndoGive()">Undo</button>';
     }
   }else if(need){
-    cls='need';who='You NEED this';detail='Grab it if they will trade.';
+    cls='need';who='You WANT this';detail='Grab it if they will trade.';
     actions='<button class="vbtn do-got" onclick="actGot()">I got it</button>';
   }else if(have){
-    cls='have';who='You HAVE this';detail='You own one copy. Not a spare, so keep it.';
+    cls='have';who='You STUCK IT';
+    var curColor=colorOf(code,val);
+    detail='Your copy is tagged '+COLORS[curColor].label+'.';
     actions='<button class="vbtn do-remove" onclick="actRemoveHave()">Don\'t own this (mistake)</button>';
   }else{
     cls='none';who='Not found';detail='That code and number is not in your lists.';
+  }
+  // color picker only for owned stickers
+  var colorPicker='';
+  if(have){
+    var cur=colorOf(code,val);
+    var swatches='';
+    for(var ci=0;ci<COLOR_ORDER.length;ci++){
+      var ck=COLOR_ORDER[ci];
+      swatches+='<button class="cswatch'+(ck===cur?' on':'')+'" title="'+COLORS[ck].label+'" '+
+        'style="background:'+COLORS[ck].c+'" onclick="pickColor(\''+code+'\',\''+val+'\',\''+ck+'\')"></button>';
+    }
+    colorPicker='<div class="cpick"><span class="cpick-label">Color tier</span><div class="cswatches">'+swatches+'</div></div>';
   }
   var nameLine=nm?('<span class="pname">'+nm+'</span>'):'';
   result.className='show';
@@ -554,7 +651,14 @@ function showVerdict(code,val){
     '<span class="who">'+who+'</span>'+
     '<span class="what">'+code+' '+val+'</span>'+nameLine+
     '<span class="detail">'+detail+'</span>'+
+    colorPicker+
     (actions?('<div class="vactions">'+actions+'</div>'):'')+'</div>';
+}
+function pickColor(code,val,key){
+  var v=(/^CC/.test(val))?val:parseInt(val,10);
+  setColor(code,v,key);
+  renderAll();showVerdict(code,v);
+  flash('Tagged '+COLORS[key].label);
 }
 function closeVerdict(){
   result.className='';result.innerHTML='';
@@ -610,7 +714,7 @@ function actUndoGive(){
 // Got it: a needed sticker is now yours. Remove from wants, add to have.
 function actGot(){
   var c=current.code,v=current.val;
-  if(!state.wants[c]||!removeOne(state.wants[c],v)){flash('Not on needs');return;}
+  if(!state.wants[c]||!removeOne(state.wants[c],v)){flash('Not on wants');return;}
   if(!state.have[c])state.have[c]=[];
   if(!inList(state.have[c],v))state.have[c].push(typeof v==='string'?v:parseInt(v,10));
   state.log=state.log||[];
@@ -634,7 +738,7 @@ function actRemoveHave(){
   state.log=state.log||[];
   state.log.push({t:Date.now(),act:'removed-have',code:c,val:v});
   saveState();renderAll();showVerdict(c,v);
-  flash('Moved '+c+' '+v+' back to Need');
+  flash('Moved '+c+' '+v+' back to Want');
 }
 // Remove a single accidental spare from Give (without giving it away).
 function actRemoveDupe(){
@@ -770,7 +874,7 @@ function updateBulkBar(){
   // actions depend on which tab is showing
   var html='';
   if(currentTab==='give'){
-    html='<button onclick="bulkGive()">Give away</button>'+
+    html='<button onclick="bulkGive()">Trade away</button>'+
          '<button class="alt" onclick="bulkRemoveDupe()">Remove spare</button>';
   }else if(currentTab==='need'){
     html='<button onclick="bulkGot()">Mark as got</button>';
@@ -808,7 +912,7 @@ function bulkRemoveHave(){bulkApply(function(c,v){
   if(state.given&&state.given[c]&&state.given[c][v])delete state.given[c][v];
   if(!state.wants[c])state.wants[c]=[];if(!inList(state.wants[c],v))state.wants[c].push((/^CC/.test(v))?v:parseInt(v,10));
   state.log.push({t:Date.now(),act:'removed-have',code:c,val:v});return true;
-},'moved back to Need');}
+},'moved back to Want');}
 
 // ---- EXPORT / IMPORT ----
 function openModal(mode){
@@ -823,20 +927,20 @@ function openModal(mode){
     ta.value=JSON.stringify(state);ta.readOnly=true;
     ac.innerHTML='<button class="b-primary" onclick="shareExport()">Send to file</button>'+
                  '<button class="b-ghost" onclick="copyExport()">Copy backup</button>'+
-                 '<button class="b-ghost" onclick="openModal(\'exportneed\')">Need list</button>'+
-                 '<button class="b-ghost" onclick="openModal(\'exportgive\')">Give list</button>'+
+                 '<button class="b-ghost" onclick="openModal(\'exportneed\')">Want list</button>'+
+                 '<button class="b-ghost" onclick="openModal(\'exportgive\')">Trade list</button>'+
                  '<button class="b-ghost" onclick="closeModal()">Close</button>';
   }else if(mode==='exportneed'){
-    t.textContent='My Need list (to post)';
-    d.textContent='Readable list of stickers you still need. Copy it and paste on a marketplace or trading group.';
+    t.textContent='My Want list (to post)';
+    d.textContent='Readable list of stickers you want. Copy it and paste on a marketplace or trading group.';
     ta.value=buildTextList(state.wants,'need');ta.readOnly=true;
     ac.innerHTML='<button class="b-primary" onclick="copyExport()">Copy</button>'+
                  '<button class="b-ghost" onclick="shareTextList(\'need\')">Send to file</button>'+
                  '<button class="b-ghost" onclick="openModal(\'export\')">Back</button>'+
                  '<button class="b-ghost" onclick="closeModal()">Close</button>';
   }else if(mode==='exportgive'){
-    t.textContent='My Give / Have-spares list (to post)';
-    d.textContent='Readable list of duplicates you can trade away. Already-given ones are excluded. Copy and paste it anywhere.';
+    t.textContent='My Trade list (to post)';
+    d.textContent='Readable list of duplicates you can trade away. Already-traded ones are excluded. Copy and paste it anywhere.';
     ta.value=buildTextList(state.dupes,'give');ta.readOnly=true;
     ac.innerHTML='<button class="b-primary" onclick="copyExport()">Copy</button>'+
                  '<button class="b-ghost" onclick="shareTextList(\'give\')">Send to file</button>'+
@@ -849,18 +953,22 @@ function openModal(mode){
     ac.innerHTML='<button class="b-primary" onclick="doImport()">Load</button>'+
                  '<button class="b-ghost" onclick="closeModal()">Cancel</button>';
   }else if(mode==='quickadd'){
-    t.textContent='Quick add stickers';
-    d.textContent='Type a code and number (like EGY17 or TUR 16). It tells you instantly if you already own it, then files it: first copy to Have, extra copies to Give.';
+    t.textContent='Quick add a pile';
+    d.textContent='Type the team code, then all the numbers from that pile (like 8 9 10). Commit files them: new ones to Stick It, repeats to Trade. Then grab your next pile.';
     ta.style.display='none';
     cu.style.display='block';
-    cu.innerHTML='<div class="qa-input-row">'+
-      '<input id="qa-input" type="text" inputmode="text" autocomplete="off" autocapitalize="characters" '+
-      'placeholder="e.g. EGY17" onkeydown="if(event.key===\'Enter\')quickAdd()">'+
-      '<button onclick="quickAdd()">Add</button></div>'+
+    cu.innerHTML='<div class="qa-team-row">'+
+      '<input id="qa-team" type="text" inputmode="text" autocomplete="off" autocapitalize="characters" '+
+      'placeholder="Team (e.g. KOR)" oninput="qaTeamEcho()" onkeydown="if(event.key===\'Enter\'){var n=document.getElementById(\'qa-nums\');if(n&&n.focus)n.focus();}">'+
+      '<span id="qa-teamname" class="qa-teamname"></span></div>'+
+      '<div class="qa-nums-row">'+
+      '<input id="qa-nums" type="text" inputmode="numeric" autocomplete="off" '+
+      'placeholder="Numbers, e.g. 8 9 10" onkeydown="if(event.key===\'Enter\')quickAddBatch()">'+
+      '<button onclick="quickAddBatch()">Commit pile</button></div>'+
       '<div class="qa-feedback" id="qa-feedback"></div>'+
       '<div class="qa-recent" id="qa-recent"></div>';
     ac.innerHTML='<button class="b-ghost" onclick="closeModal()">Done</button>';
-    setTimeout(function(){var qi=document.getElementById('qa-input');if(qi&&qi.focus)qi.focus();},100);
+    setTimeout(function(){var qi=document.getElementById('qa-team');if(qi&&qi.focus)qi.focus();},100);
     renderQaRecent();
   }else if(mode==='compare'){
     t.textContent='Compare with a friend';
@@ -918,7 +1026,7 @@ function quickAdd(){
     state.log=state.log||[];state.log.push({t:Date.now(),act:'added-new',code:code,val:val});
     fb.innerHTML='<div class="qa-card new"><span class="qwho">New - added to your album</span>'+
       '<span class="qwhat">'+code+' '+val+'</span>'+(nm?('<span class="qname">'+nm+'</span>'):'')+
-      '<span class="qdetail">You did not have this yet. Now in Have.</span></div>';
+      '<span class="qdetail">You did not have this yet. Now in Stick It.</span></div>';
   }else{
     // Already owned: this copy is a duplicate, add to Give.
     if(!state.dupes[code])state.dupes[code]=[];
@@ -927,7 +1035,7 @@ function quickAdd(){
     var spares=countIn(state.dupes[code],val)-givenCount(code,val);
     fb.innerHTML='<div class="qa-card dupe"><span class="qwho">Duplicate - you already own it</span>'+
       '<span class="qwhat">'+code+' '+val+'</span>'+(nm?('<span class="qname">'+nm+'</span>'):'')+
-      '<span class="qdetail">Added to Give. You now have '+spares+' spare'+(spares!==1?'s':'')+'.</span></div>';
+      '<span class="qdetail">Added to Trade. You now have '+spares+' spare'+(spares!==1?'s':'')+'.</span></div>';
   }
   saveState();renderAll();renderQaRecent();
   inp.value='';if(inp.focus)inp.focus();
@@ -935,11 +1043,91 @@ function quickAdd(){
 function renderQaRecent(){
   var box=document.getElementById('qa-recent');if(!box)return;
   if(!state.log||!state.log.length){box.innerHTML='';return;}
-  var adds=state.log.filter(function(e){return e.act==='added-new'||e.act==='added-dupe';}).slice(-6).reverse();
+  var adds=state.log.filter(function(e){return e.act==='added-new'||e.act==='added-dupe';}).slice(-8).reverse();
   if(!adds.length){box.innerHTML='';return;}
   var s='Recent: ';
   s+=adds.map(function(e){return '<b>'+e.code+' '+e.val+'</b>'+(e.act==='added-dupe'?' (dupe)':'');}).join(', ');
   box.innerHTML=s;
+}
+// Echo the team name as you type the code, so you know you picked the right one.
+function qaTeamEcho(){
+  var ti=document.getElementById('qa-team');var out=document.getElementById('qa-teamname');
+  if(!ti||!out)return;
+  var code=(ti.value||'').trim().toUpperCase();
+  if(!code){out.textContent='';out.className='qa-teamname';return;}
+  if(NAMES[code]||['INTRO','MUSEUM','CC','LOGO'].indexOf(code)>-1){
+    var label=({INTRO:'Intro',MUSEUM:'Museum',CC:'Coca-Cola',LOGO:'Logo'})[code]||teamFullName(code);
+    out.textContent='✓ '+label;out.className='qa-teamname ok';
+  }else{
+    out.textContent='not a team code';out.className='qa-teamname bad';
+  }
+}
+function teamFullName(code){
+  // derive a readable country name from the team-photo or any player suffix is hard;
+  // use the group member display. Fall back to the code.
+  var map={MEX:'Mexico',RSA:'South Africa',KOR:'South Korea',CZE:'Czechia',CAN:'Canada',SUI:'Switzerland',QAT:'Qatar',BIH:'Bosnia',BRA:'Brazil',MAR:'Morocco',HAI:'Haiti',SCO:'Scotland',USA:'USA',PAR:'Paraguay',AUS:'Australia',TUR:'Türkiye',GER:'Germany',CUW:'Curaçao',CIV:'Ivory Coast',ECU:'Ecuador',NED:'Netherlands',JPN:'Japan',TUN:'Tunisia',SWE:'Sweden',BEL:'Belgium',EGY:'Egypt',IRN:'Iran',NZL:'New Zealand',ESP:'Spain',CPV:'Cape Verde',KSA:'Saudi Arabia',URU:'Uruguay',FRA:'France',SEN:'Senegal',NOR:'Norway',IRQ:'Iraq',ARG:'Argentina',ALG:'Algeria',AUT:'Austria',JOR:'Jordan',POR:'Portugal',COD:'Congo DR',UZB:'Uzbekistan',COL:'Colombia',ENG:'England',CRO:'Croatia',GHA:'Ghana',PAN:'Panama'};
+  return map[code]||code;
+}
+// Add one sticker; returns 'new' | 'dupe' | 'badrange'. Updates state but does NOT save/render.
+function addOneSticker(code,val){
+  var full=fullSetFor(code);
+  if(!inList(full,val))return 'badrange';
+  var alreadyHave=state.have[code]&&inList(state.have[code],val);
+  if(!alreadyHave){
+    if(!state.have[code])state.have[code]=[];
+    state.have[code].push(val);
+    if(state.wants[code])removeOne(state.wants[code],val);
+    state.log=state.log||[];state.log.push({t:Date.now(),act:'added-new',code:code,val:val});
+    return 'new';
+  }else{
+    if(!state.dupes[code])state.dupes[code]=[];
+    state.dupes[code].push(val);
+    state.log=state.log||[];state.log.push({t:Date.now(),act:'added-dupe',code:code,val:val});
+    return 'dupe';
+  }
+}
+// Commit a whole pile: one team code + a list of numbers.
+function quickAddBatch(){
+  var ti=document.getElementById('qa-team');
+  var ni=document.getElementById('qa-nums');
+  var fb=document.getElementById('qa-feedback');
+  var code=(ti.value||'').trim().toUpperCase();
+  if(!code){fb.innerHTML=qaCard('bad','Pick a team first','','Type a team code like KOR.');return;}
+  if(!NAMES[code] && ['INTRO','MUSEUM','CC','LOGO'].indexOf(code)===-1){
+    fb.innerHTML=qaCard('bad','Unknown team code',code,'That is not a team in this album.');return;
+  }
+  // parse numbers: split on spaces, commas. Handle CC tokens for the CC team.
+  var raw=(ni.value||'').toUpperCase();
+  var tokens=raw.match(/CC\d+|\d+/g)||[];
+  if(!tokens.length){fb.innerHTML=qaCard('bad','No numbers','','Type the pile\'s numbers, like 8 9 10.');return;}
+  var results={newList:[],dupeList:[],badList:[]};
+  for(var i=0;i<tokens.length;i++){
+    var tk=tokens[i];
+    var val;
+    if(code==='CC'){val=(/^CC/.test(tk))?tk:('CC'+tk);}
+    else{val=parseInt(tk.replace(/\D/g,''),10);}
+    var r=addOneSticker(code,val);
+    var shown=(code==='CC')?val:val;
+    if(r==='new')results.newList.push(shown);
+    else if(r==='dupe')results.dupeList.push(shown);
+    else results.badList.push(shown);
+  }
+  saveState();renderAll();renderQaRecent();
+  // build a summary card
+  var parts=[];
+  if(results.newList.length)parts.push('<div class="qa-sumline new"><b>'+results.newList.length+' new</b> → Stick It: '+results.newList.join(', ')+'</div>');
+  if(results.dupeList.length)parts.push('<div class="qa-sumline dupe"><b>'+results.dupeList.length+' dupe'+(results.dupeList.length>1?'s':'')+'</b> → Trade: '+results.dupeList.join(', ')+'</div>');
+  if(results.badList.length)parts.push('<div class="qa-sumline bad"><b>'+results.badList.length+' skipped</b> (out of range): '+results.badList.join(', ')+'</div>');
+  var nm=teamFullName(code);
+  fb.innerHTML='<div class="qa-card sum"><span class="qwho">'+nm+' pile committed</span>'+parts.join('')+'</div>';
+  // reset for next pile
+  ti.value='';ni.value='';qaTeamEcho();
+  if(ti.focus)ti.focus();
+}
+function qaCard(cls,who,what,detail){
+  return '<div class="qa-card '+cls+'"><span class="qwho">'+who+'</span>'+
+    (what?('<span class="qwhat">'+what+'</span>'):'')+
+    (detail?('<span class="qdetail">'+detail+'</span>'):'')+'</div>';
 }
 
 // ---- COMPARE ----
@@ -997,8 +1185,8 @@ function runCompare(){
     return '<div class="cmp-list">'+list.map(function(x){return '<span class="cmp-chip">'+x+'</span>';}).join('')+'</div>';
   }
   box.innerHTML=
-    '<div class="cmp-section cmp-give"><h3><span class="cmp-dot"></span>I can give them ('+iCanGive.length+')</h3>'+chips(iCanGive)+'</div>'+
-    '<div class="cmp-section cmp-need"><h3><span class="cmp-dot"></span>They have what I need ('+theyHaveINeed.length+')</h3>'+chips(theyHaveINeed)+'</div>'+
+    '<div class="cmp-section cmp-give"><h3><span class="cmp-dot"></span>I can trade them ('+iCanGive.length+')</h3>'+chips(iCanGive)+'</div>'+
+    '<div class="cmp-section cmp-need"><h3><span class="cmp-dot"></span>They have what I want ('+theyHaveINeed.length+')</h3>'+chips(theyHaveINeed)+'</div>'+
     '<div class="cmp-empty" style="margin-top:10px">Top row reads their list as stickers they want. Bottom row reads it as stickers they own.</div>';
 }
 
@@ -1013,7 +1201,7 @@ function copyExport(){
 // Build a clean, human-readable list for posting. kind 'need' or 'give'.
 function buildTextList(data,kind){
   var lines=[];
-  var header=(kind==='need')?'WC26 Panini - STICKERS I NEED':'WC26 Panini - STICKERS I CAN TRADE';
+  var header=(kind==='need')?'WC26 Panini - STICKERS I WANT':'WC26 Panini - STICKERS TO TRADE';
   lines.push(header);lines.push('');
   function emit(code,label){
     var items=data[code];if(!items||!items.length)return;
@@ -1051,7 +1239,7 @@ function buildTextList(data,kind){
     else total+=data[c].length;
   }
   lines.push('');
-  lines.push('Total: '+total+(kind==='need'?' needed':' to trade'));
+  lines.push('Total: '+total+(kind==='need'?' wanted':' to trade'));
   return lines.join('\n');
 }
 function shareTextList(kind){
@@ -1108,7 +1296,7 @@ function doImport(){
   try{
     var p=JSON.parse(raw);
     if(!p.dupes||!p.wants||!p.have){flash('That does not look right');return;}
-    state=p;state.log=state.log||[];if(!state.given)state.given={};if(!state.favs)state.favs={};
+    state=p;state.log=state.log||[];if(!state.given)state.given={};if(!state.favs)state.favs={};if(!state.colors)state.colors={};
     saveState();renderAll();closeModal();
     document.getElementById('search').value='';lookup('');
     flash('Imported');
