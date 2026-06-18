@@ -552,6 +552,9 @@ function showVerdict(code,val){
 function closeVerdict(){
   result.className='';result.innerHTML='';
   current={code:null,val:null};
+  // also clear the search bar and any filter it applied
+  var sb=document.getElementById('search');
+  if(sb&&sb.value){sb.value='';clearHits();showAllTeams();toggleClear('');}
 }
 function chipTap(ev,code,val){
   if(selectMode){
@@ -711,7 +714,11 @@ function switchTab(tab){
     document.getElementById('tab-'+ids[i]).className='tab '+ids[i]+(ids[i]===tab?' active':'');
     document.getElementById('panel-'+ids[i]).className=(ids[i]===tab)?'panel':'panel hidden';
   }
-  var q=document.getElementById('search').value;if(q)lookup(q);
+  // switching tabs dismisses an uncommitted verdict popup and clears the
+  // search/filter it came from, so it doesn't follow you to the new tab
+  result.className='';result.innerHTML='';current={code:null,val:null};
+  var sb=document.getElementById('search');
+  if(sb&&sb.value){sb.value='';clearHits();showAllTeams();toggleClear('');}
   if(selectMode){clearSelection();updateBulkBar();}
 }
 
