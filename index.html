@@ -111,6 +111,17 @@
   .vbtn{font-size:0.82rem;font-weight:800;padding:9px 14px;border-radius:9px;border:none;cursor:pointer;}
   .vbtn.do-give{background:var(--gold);color:#1a1303;}
   .vbtn.do-undo{background:rgba(255,255,255,0.12);color:var(--chalk);}
+  .vbtn.do-remove{background:rgba(217,83,79,0.18);color:#ff8f8b;border:1px solid rgba(217,83,79,0.5);}
+  .bulkbar{position:fixed;left:0;right:0;bottom:0;z-index:80;background:var(--darkblue);border-top:2px solid var(--gold);padding:11px 14px calc(11px + env(safe-area-inset-bottom));display:none;align-items:center;gap:10px;box-shadow:0 -6px 18px rgba(0,0,0,0.4);}
+  .bulkbar.show{display:flex;}
+  .bulk-count{font-size:0.8rem;font-weight:800;color:var(--gold);white-space:nowrap;}
+  .bulk-actions{display:flex;gap:7px;flex:1;overflow-x:auto;}
+  .bulk-actions button{flex:0 0 auto;font-size:0.78rem;font-weight:800;padding:9px 13px;border-radius:9px;border:none;cursor:pointer;background:var(--gold);color:#1a1303;white-space:nowrap;}
+  .bulk-actions button.alt{background:rgba(255,255,255,0.14);color:var(--chalk);}
+  .bulk-cancel{flex:0 0 auto;font-size:0.78rem;font-weight:700;padding:9px 13px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--chalk);cursor:pointer;}
+  body.selectmode .chip{outline:1px dashed rgba(255,255,255,0.2);}
+  .chip.sel{outline:2px solid var(--gold)!important;outline-offset:1px;background:rgba(213,176,72,0.25)!important;}
+  body.selectmode{padding-bottom:80px;}
   .vbtn.do-got{background:var(--have);color:#06160b;}
   .tabs{display:flex;gap:5px;padding:14px 16px 0;}
   .tab{flex:1;text-align:center;padding:9px 4px;border-radius:9px 9px 0 0;font-weight:700;font-size:0.78rem;cursor:pointer;background:#16271c;color:var(--chalk-dim);border:1px solid var(--line);border-bottom:none;}
@@ -175,6 +186,7 @@
   <div class="toolbar">
     <button class="tbtn tbtn-accent" onclick="openModal('quickadd')">+ Quick add</button>
     <button class="tbtn tbtn-accent" onclick="openModal('compare')">Compare</button>
+    <button class="tbtn" id="selectBtn" onclick="toggleSelectMode()">Select</button>
     <button class="tbtn" onclick="openModal('export')">Export</button>
     <button class="tbtn" onclick="openModal('import')">Import</button>
     <button class="tbtn" onclick="resetAll()">Reset</button>
@@ -198,6 +210,12 @@
 <div class="panel" id="panel-give"></div>
 <div class="panel hidden" id="panel-need"></div>
 <div class="panel hidden" id="panel-have"></div>
+
+<div id="bulkbar" class="bulkbar">
+  <span id="bulk-count" class="bulk-count">0 selected</span>
+  <div class="bulk-actions" id="bulk-actions"></div>
+  <button class="bulk-cancel" onclick="exitSelectMode()">Done</button>
+</div>
 
 <footer>Tap a sticker for a verdict and action. Give marks a dupe as traded; Got it moves a need into your collection. Export often so you do not lose changes.</footer>
 
@@ -350,12 +368,12 @@ function chipHTML(code,val,kind,cnt){
     var cls='chip give'+((remaining<=0)?' given':'');
     var tag=(given>0)?('<span class="gtag">'+(remaining<=0?'all given':('gave '+given))+'</span>'):'';
     return '<span class="'+cls+'" data-name="'+nm.toLowerCase().replace(/"/g,'')+'" '+
-      'onclick="pick(\''+code+'\',\''+val+'\')"><span class="cnum">'+label+'</span>'+nameHtml+tag+'</span>';
+      'onclick="chipTap(event,\''+code+'\',\''+val+'\')"><span class="cnum">'+label+'</span>'+nameHtml+tag+'</span>';
   }
   var label2=String(val);
   var nameHtml2=nm?('<span class="cname">'+nm.replace(/"/g,'&quot;')+'</span>'):'';
   return '<span class="chip '+kind+'" data-name="'+nm.toLowerCase().replace(/"/g,'')+'" '+
-    'onclick="pick(\''+code+'\',\''+val+'\')"><span class="cnum">'+label2+'</span>'+nameHtml2+'</span>';
+    'onclick="chipTap(event,\''+code+'\',\''+val+'\')"><span class="cnum">'+label2+'</span>'+nameHtml2+'</span>';
 }
 function teamBlockHTML(code,items,kind){
   var order,m=null,chips='';
@@ -490,7 +508,12 @@ function renderCounts(){
   document.getElementById('cnt-need').textContent=n;
   document.getElementById('cnt-have').textContent=h;
 }
-function renderAll(){renderPanel('give');renderPanel('need');renderPanel('have');renderCounts();renderHeaderProgress();}
+function renderAll(){
+  var y=(typeof window!=='undefined'&&window.scrollY)||0;
+  renderPanel('give');renderPanel('need');renderPanel('have');renderCounts();renderHeaderProgress();
+  // restore scroll so actions don't bounce the page to the top
+  if(typeof window!=='undefined'&&window.scrollTo){window.scrollTo(0,y);}
+}
 
 // ---- VERDICT + ACTIONS ----
 var result=document.getElementById('result');
@@ -511,6 +534,7 @@ function showVerdict(code,val){
       detail=(give>1?('You have '+avail+' of '+give+' spares left to give.'):'You have 1 spare.');
       actions='<button class="vbtn do-give" onclick="actGive()">Give it away</button>';
       if(givenN>0)actions+='<button class="vbtn do-undo" onclick="actUndoGive()">Undo last</button>';
+      actions+='<button class="vbtn do-remove" onclick="actRemoveDupe()">Remove spare (mistake)</button>';
     }else{
       cls='given-v';who='Already given away';
       detail='You traded all '+give+' spare'+(give>1?'s':'')+' of this.';
@@ -521,6 +545,7 @@ function showVerdict(code,val){
     actions='<button class="vbtn do-got" onclick="actGot()">I got it</button>';
   }else if(have){
     cls='have';who='You HAVE this';detail='You own one copy. Not a spare, so keep it.';
+    actions='<button class="vbtn do-remove" onclick="actRemoveHave()">Don\'t own this (mistake)</button>';
   }else{
     cls='none';who='Not found';detail='That code and number is not in your lists.';
   }
@@ -530,6 +555,16 @@ function showVerdict(code,val){
     '<span class="what">'+code+' '+val+'</span>'+nameLine+
     '<span class="detail">'+detail+'</span>'+
     (actions?('<div class="vactions">'+actions+'</div>'):'')+'</div>';
+}
+function chipTap(ev,code,val){
+  if(selectMode){
+    var el=(ev&&(ev.currentTarget||ev.target))||null;
+    // climb to the .chip element if a child was tapped
+    if(el&&el.className.indexOf('chip')===-1&&el.parentNode)el=el.parentNode;
+    toggleSelect(code,val,el);
+    return;
+  }
+  pick(code,val);
 }
 function pick(code,val){
   document.getElementById('search').value=code+' '+val;
@@ -576,6 +611,36 @@ function actGot(){
   state.log.push({t:Date.now(),act:'got',code:c,val:v});
   saveState();renderAll();showVerdict(c,v);
   flash('Got '+c+' '+v);
+}
+// Remove from Have: you don't actually own this. Send it back to Need.
+// Also clears any spares of it, since you can't have a spare of something you don't own.
+function actRemoveHave(){
+  var c=current.code,v=current.val;
+  if(!state.have[c]||!inList(state.have[c],v)){flash('Not in your album');return;}
+  // remove every copy from have
+  while(removeOne(state.have[c],v)){}
+  // clear any dupes/spares of it
+  if(state.dupes[c]){while(removeOne(state.dupes[c],v)){}}
+  if(state.given&&state.given[c]&&state.given[c][v]){delete state.given[c][v];}
+  // put it back on the needs list
+  if(!state.wants[c])state.wants[c]=[];
+  if(!inList(state.wants[c],v))state.wants[c].push(typeof v==='string'?v:parseInt(v,10));
+  state.log=state.log||[];
+  state.log.push({t:Date.now(),act:'removed-have',code:c,val:v});
+  saveState();renderAll();showVerdict(c,v);
+  flash('Moved '+c+' '+v+' back to Need');
+}
+// Remove a single accidental spare from Give (without giving it away).
+function actRemoveDupe(){
+  var c=current.code,v=current.val;
+  if(!state.dupes[c]||!removeOne(state.dupes[c],v)){flash('No spare to remove');return;}
+  // if given count now exceeds remaining copies, trim it
+  var remaining=countIn(state.dupes[c],v);
+  if(state.given&&state.given[c]&&state.given[c][v]>remaining){state.given[c][v]=remaining;if(state.given[c][v]<=0)delete state.given[c][v];}
+  state.log=state.log||[];
+  state.log.push({t:Date.now(),act:'removed-dupe',code:c,val:v});
+  saveState();renderAll();showVerdict(c,v);
+  flash('Removed a spare of '+c+' '+v);
 }
 
 // ---- SEARCH ----
@@ -642,14 +707,98 @@ function lookup(q){
   // anything else (a name, or letters that aren't a team code) -> name search
   result.className='';result.innerHTML='';nameSearch(q.toLowerCase());
 }
+var currentTab='give';
 function switchTab(tab){
+  currentTab=tab;
   var ids=['give','need','have'];
   for(var i=0;i<ids.length;i++){
     document.getElementById('tab-'+ids[i]).className='tab '+ids[i]+(ids[i]===tab?' active':'');
     document.getElementById('panel-'+ids[i]).className=(ids[i]===tab)?'panel':'panel hidden';
   }
   var q=document.getElementById('search').value;if(q)lookup(q);
+  if(selectMode){clearSelection();updateBulkBar();}
 }
+
+// ---- BULK SELECT ----
+var selectMode=false;
+var selection={}; // key "CODE|VAL" -> {code,val}
+function selKey(code,val){return code+'|'+val;}
+function toggleSelectMode(){ if(selectMode)exitSelectMode(); else enterSelectMode(); }
+function enterSelectMode(){
+  selectMode=true;selection={};
+  document.body.className=(document.body.className+' selectmode').trim();
+  document.getElementById('selectBtn').className='tbtn tbtn-accent';
+  document.getElementById('selectBtn').textContent='Selecting';
+  result.className='';result.innerHTML='';
+  updateBulkBar();
+}
+function exitSelectMode(){
+  selectMode=false;clearSelection();
+  document.body.className=document.body.className.replace(/\bselectmode\b/,'').replace(/\s+/g,' ').trim();
+  var b=document.getElementById('selectBtn');b.className='tbtn';b.textContent='Select';
+  document.getElementById('bulkbar').className='bulkbar';
+}
+function clearSelection(){
+  selection={};
+  var sel=document.querySelectorAll('.chip.sel');
+  for(var i=0;i<sel.length;i++)sel[i].className=sel[i].className.replace(' sel','');
+}
+function toggleSelect(code,val,el){
+  var k=selKey(code,val);
+  if(selection[k]){delete selection[k];if(el)el.className=el.className.replace(' sel','');}
+  else{selection[k]={code:code,val:val};if(el&&el.className.indexOf(' sel')===-1)el.className+=' sel';}
+  updateBulkBar();
+}
+function selectionCount(){return Object.keys(selection).length;}
+function updateBulkBar(){
+  var bar=document.getElementById('bulkbar');
+  if(!selectMode){bar.className='bulkbar';return;}
+  bar.className='bulkbar show';
+  var n=selectionCount();
+  document.getElementById('bulk-count').textContent=n+' selected';
+  var acts=document.getElementById('bulk-actions');
+  // actions depend on which tab is showing
+  var html='';
+  if(currentTab==='give'){
+    html='<button onclick="bulkGive()">Give away</button>'+
+         '<button class="alt" onclick="bulkRemoveDupe()">Remove spare</button>';
+  }else if(currentTab==='need'){
+    html='<button onclick="bulkGot()">Mark as got</button>';
+  }else{ // have
+    html='<button class="alt" onclick="bulkRemoveHave()">Don\'t own these</button>';
+  }
+  acts.innerHTML=html;
+}
+function bulkApply(fn,label){
+  var keys=Object.keys(selection);
+  if(!keys.length){flash('Nothing selected');return;}
+  var count=0;
+  for(var i=0;i<keys.length;i++){var s=selection[keys[i]];if(fn(s.code,s.val))count++;}
+  clearSelection();saveState();renderAll();updateBulkBar();
+  flash(count+' '+label);
+}
+function bulkGive(){bulkApply(function(c,v){
+  if(!state.dupes[c])return false;var total=countIn(state.dupes[c],v);var g=givenCount(c,v);
+  if(g>=total)return false;if(!state.given)state.given={};if(!state.given[c])state.given[c]={};
+  state.given[c][v]=g+1;state.log.push({t:Date.now(),act:'gave',code:c,val:v});return true;
+},'given away');}
+function bulkRemoveDupe(){bulkApply(function(c,v){
+  if(!state.dupes[c]||!removeOne(state.dupes[c],v))return false;
+  state.log.push({t:Date.now(),act:'removed-dupe',code:c,val:v});return true;
+},'spares removed');}
+function bulkGot(){bulkApply(function(c,v){
+  if(!state.wants[c]||!removeOne(state.wants[c],v))return false;
+  if(!state.have[c])state.have[c]=[];if(!inList(state.have[c],v))state.have[c].push((/^CC/.test(v))?v:parseInt(v,10));
+  state.log.push({t:Date.now(),act:'got',code:c,val:v});return true;
+},'marked as got');}
+function bulkRemoveHave(){bulkApply(function(c,v){
+  if(!state.have[c]||!inList(state.have[c],v))return false;
+  while(removeOne(state.have[c],v)){}
+  if(state.dupes[c]){while(removeOne(state.dupes[c],v)){}}
+  if(state.given&&state.given[c]&&state.given[c][v])delete state.given[c][v];
+  if(!state.wants[c])state.wants[c]=[];if(!inList(state.wants[c],v))state.wants[c].push((/^CC/.test(v))?v:parseInt(v,10));
+  state.log.push({t:Date.now(),act:'removed-have',code:c,val:v});return true;
+},'moved back to Need');}
 
 // ---- EXPORT / IMPORT ----
 function openModal(mode){
