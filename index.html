@@ -100,7 +100,10 @@
   .qa-recent b{color:var(--chalk);}
   /* compare results */
   .cmp-section{margin-top:14px;}
-  .cmp-section h3{font-size:0.85rem;margin-bottom:7px;display:flex;align-items:center;gap:7px;}
+  .cmp-section h3{font-size:0.85rem;margin-bottom:4px;display:flex;align-items:center;gap:7px;}
+  .cmp-hint{font-size:0.7rem;color:#88a3bb;margin-bottom:7px;line-height:1.3;}
+  .cmp-warn{font-size:0.76rem;color:#ffd9a0;background:rgba(213,176,72,0.12);border:1px solid var(--gold);border-radius:9px;padding:9px 11px;margin-bottom:12px;line-height:1.4;}
+  .cmp-warn b{color:var(--gold);}
   .cmp-dot{width:10px;height:10px;border-radius:50%;display:inline-block;}
   .cmp-give h3 .cmp-dot{background:var(--give);}
   .cmp-need h3 .cmp-dot{background:var(--need);}
@@ -277,7 +280,7 @@
   <button class="bulk-cancel" onclick="exitSelectMode()">Done</button>
 </div>
 
-<footer>Tap a sticker for a verdict and action. Trade marks a dupe as traded; Got it moves a want into your collection. Export often so you do not lose changes.<br><br><span class="disclaimer">Rondo is an unofficial fan-made tracker. Not affiliated with or endorsed by Panini or FIFA. All trademarks belong to their respective owners.</span><br><span class="version">rondo-2026.06.18-155129</span></footer>
+<footer>Tap a sticker for a verdict and action. Trade marks a dupe as traded; Got it moves a want into your collection. Export often so you do not lose changes.<br><br><span class="disclaimer">Rondo is an unofficial fan-made tracker. Not affiliated with or endorsed by Panini or FIFA. All trademarks belong to their respective owners.</span><br><span class="version">rondo-2026.06.18-231306</span></footer>
 
 <div class="modal" id="modal">
   <div class="modal-card">
@@ -1165,12 +1168,16 @@ function parseList(text){
   var curCode=null;
   for(var i=0;i<lines.length;i++){
     var line=lines[i].trim();if(!line)continue;
+    // Skip header and total lines that are not sticker data.
+    if(/^(WC26|WC 26|STICKERS|TOTAL|MY |PANINI)/i.test(line))continue;
+    if(/total\s*:/i.test(line))continue;
+    // Remove "(x2)" style multipliers so they are not read as a number 2.
+    var pre=line.replace(/\(\s*x\s*\d+\s*\)/gi,' ').replace(/\bx\d+\b/gi,' ');
     // Strip emoji/flags and stray punctuation, keep letters, digits, spaces, commas.
-    var cleaned=line.toUpperCase().replace(/[^A-Z0-9, ]/g,' ').replace(/\s+/g,' ').trim();
+    var cleaned=pre.toUpperCase().replace(/[^A-Z0-9, ]/g,' ').replace(/\s+/g,' ').trim();
     if(!cleaned)continue;
     // Find a leading team code (letters at the very start, before any digit).
     var cm=cleaned.match(/^([A-Z]{2,6})/);
-    var nums=[];
     var rest=cleaned;
     if(cm){curCode=cm[1];rest=cleaned.slice(cm[1].length);}
     if(!curCode)continue;
@@ -1179,7 +1186,7 @@ function parseList(text){
     for(var k=0;k<tokens.length;k++){
       var tk=tokens[k];
       if(curCode==='CC'||/^CC/.test(tk))out['CC']=(out['CC']||[]).concat(['CC'+tk.replace(/\D/g,'')]);
-      else{ if(!out[curCode])out[curCode]=[]; out[curCode].push(parseInt(tk,10)); }
+      else{ if(!out[curCode])out[curCode]=[]; var n=parseInt(tk,10); if(!inList(out[curCode],n))out[curCode].push(n); }
     }
   }
   return out;
@@ -1191,29 +1198,58 @@ function runCompare(){
   if(!Object.keys(theirs).length){
     box.innerHTML='<div class="cmp-empty">Could not find any stickers in that text. Try lines like "EGY 17" or "MEX 6, 8".</div>';return;
   }
-  // What I can give them = their wants that are my available dupes.
-  // But a pasted list might be their WANTS or their HAVES. We interpret it as their wants
-  // for "I can give" and as their haves for "they have what I need". Show both, labeled.
-  var iCanGive=[];   // their list ∩ my available spares
-  var theyHaveINeed=[]; // their list ∩ my wants
+  // A pasted list is usually their TRADE list (stickers they own and will give).
+  // The useful match: which of those do I WANT? That is a real trade for me.
+  // Separately, if the list were their WANTS, which can I cover from my spares?
+  var theyTradeIWant=[];   // their list ∩ my wants  (they give, I receive)
+  var iCoverTheirList=[];  // their list ∩ my spares (if their list were wants, I could give)
   for(var code in theirs){
     var vals=theirs[code];
     for(var i=0;i<vals.length;i++){
       var v=vals[i];
-      var avail=(state.dupes[code]?countIn(state.dupes[code],v):0)-givenCount(code,v);
       var label=(code==='CC')?String(v):(code+' '+v);
-      if(avail>0)iCanGive.push(label);
-      if(state.wants[code]&&inList(state.wants[code],v))theyHaveINeed.push(label);
+      if(state.wants[code]&&inList(state.wants[code],v))theyTradeIWant.push(label);
+      var avail=(state.dupes[code]?countIn(state.dupes[code],v):0)-givenCount(code,v);
+      if(avail>0)iCoverTheirList.push(label);
     }
   }
-  function chips(list){
+  function chips(list,cls){
     if(!list.length)return '<div class="cmp-empty">None.</div>';
-    return '<div class="cmp-list">'+list.map(function(x){return '<span class="cmp-chip">'+x+'</span>';}).join('')+'</div>';
+    return '<div class="cmp-list">'+list.map(function(x){return '<span class="cmp-chip '+cls+'">'+x+'</span>';}).join('')+'</div>';
+  }
+  // Self-check: does the pasted list look like it was meant to be YOUR trade list,
+  // but disagree with your current collection? This catches stale or edited exports.
+  // A sticker is "off" if the list presents it as a tradeable spare, yet your data
+  // says you actually want it or do not own a spare of it.
+  var looksLikeMine=/STICKERS TO TRADE/i.test(text);
+  var conflicts=[];
+  if(looksLikeMine){
+    for(var c2 in theirs){
+      for(var j=0;j<theirs[c2].length;j++){
+        var vv=theirs[c2][j];
+        var haveSpare=(state.dupes[c2]?countIn(state.dupes[c2],vv):0)>0;
+        var iWantIt=state.wants[c2]&&inList(state.wants[c2],vv);
+        if(!haveSpare && iWantIt){
+          conflicts.push((c2==='CC'?String(vv):(c2+' '+vv)));
+        }
+      }
+    }
+  }
+  var warnHtml='';
+  if(conflicts.length){
+    warnHtml='<div class="cmp-warn"><b>Heads up:</b> this list looks like your own trade list, but '+
+      conflicts.length+' sticker'+(conflicts.length>1?'s':'')+' on it '+(conflicts.length>1?'are':'is')+
+      ' actually on your Want list and not a spare you hold: '+conflicts.join(', ')+
+      '. The pasted text may be out of date. Re-export your Trade list to refresh it.</div>';
   }
   box.innerHTML=
-    '<div class="cmp-section cmp-give"><h3><span class="cmp-dot"></span>I can trade them ('+iCanGive.length+')</h3>'+chips(iCanGive)+'</div>'+
-    '<div class="cmp-section cmp-need"><h3><span class="cmp-dot"></span>They have what I want ('+theyHaveINeed.length+')</h3>'+chips(theyHaveINeed)+'</div>'+
-    '<div class="cmp-empty" style="margin-top:10px">Top row reads their list as stickers they want. Bottom row reads it as stickers they own.</div>';
+    warnHtml+
+    '<div class="cmp-section cmp-need"><h3><span class="cmp-dot"></span>If this is their TRADE list, I want ('+theyTradeIWant.length+')</h3>'+
+      '<div class="cmp-hint">Stickers they are offering that you still need. These are your trades to ask for.</div>'+
+      chips(theyTradeIWant,'want')+'</div>'+
+    '<div class="cmp-section cmp-give"><h3><span class="cmp-dot"></span>If this is their WANT list, I can give ('+iCoverTheirList.length+')</h3>'+
+      '<div class="cmp-hint">Stickers on their list that you have spares of. These are trades you can offer.</div>'+
+      chips(iCoverTheirList,'give')+'</div>';
 }
 
 function copyExport(){
