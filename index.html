@@ -21,14 +21,19 @@
   }
   *{box-sizing:border-box;margin:0;padding:0;}
   body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--ink);color:var(--chalk);line-height:1.4;padding-bottom:60px;}
-  header{background:var(--pitch);padding:calc(8px + env(safe-area-inset-top)) 18px 14px;border-bottom:3px solid var(--gold);position:sticky;top:0;z-index:50;box-shadow:0 6px 18px rgba(0,0,0,0.4);}
+  header{background:var(--pitch);padding:calc(2px + env(safe-area-inset-top)) 18px 12px;border-bottom:3px solid var(--gold);position:sticky;top:0;z-index:50;box-shadow:0 6px 18px rgba(0,0,0,0.4);}
   h1{font-size:1.25rem;font-weight:800;letter-spacing:-0.02em;display:flex;align-items:center;gap:9px;}
   h1 .logo{flex:0 0 auto;color:var(--chalk);}
   h1 .badge{font-size:0.58rem;font-weight:700;letter-spacing:0.08em;background:var(--gold);color:var(--ink);padding:3px 8px;border-radius:99px;text-transform:uppercase;}
   .sub{font-size:0.76rem;color:var(--chalk-dim);margin-top:3px;}
-  .toolbar{display:flex;gap:6px;margin-top:11px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:2px;}
-  .tbtn{flex:0 0 auto;font-size:0.7rem;font-weight:700;padding:7px 11px;border-radius:8px;background:rgba(0,0,0,0.3);color:var(--chalk);border:1px solid var(--line);cursor:pointer;white-space:nowrap;}
+  .toolbar{display:flex;align-items:center;gap:7px;margin-top:11px;}
+  .tbtn{flex:0 0 auto;width:38px;height:38px;display:flex;align-items:center;justify-content:center;border-radius:10px;background:rgba(255,255,255,0.06);color:var(--chalk-dim);border:1px solid var(--line);cursor:pointer;padding:0;transition:background .12s ease,color .12s ease;}
+  .tbtn:active{transform:scale(0.94);}
   .tbtn-accent{background:var(--gold);color:#1a1303;border-color:var(--gold);}
+  .tbtn-danger{color:#e0857f;border-color:rgba(217,83,79,0.35);}
+  .tbtn-danger:active{background:rgba(217,83,79,0.18);}
+  .tbtn.on{background:var(--gold);color:#1a1303;border-color:var(--gold);}
+  .tbar-div{flex:0 0 auto;width:1px;height:24px;background:var(--line);margin:0 2px;}
   .tbtn:active{opacity:0.85;}
   /* progress bars */
   .progress-wrap{padding:0 4px 4px;}
@@ -104,11 +109,12 @@
   .cmp-need .cmp-chip{background:var(--need-bg);color:#ff8f8b;border:1px solid var(--need);}
   .cmp-empty{font-size:0.8rem;color:#88a3bb;padding:6px 0;}
   .tbtn:active{background:rgba(0,0,0,0.5);}
-  .search-wrap{margin-top:11px;position:relative;}
-  #search{width:100%;font-size:1.05rem;padding:12px 44px 12px 14px;border-radius:11px;border:2px solid var(--line);background:rgba(0,0,0,0.3);color:var(--chalk);outline:none;font-weight:600;}
+  .search-wrap{margin-top:10px;position:relative;}
+  #search{width:100%;font-size:1rem;padding:8px 40px 8px 14px;border-radius:10px;border:1px solid var(--line);background:rgba(0,0,0,0.25);color:var(--chalk);outline:none;font-weight:500;}
+  #search:focus{border-color:var(--gold);background:rgba(0,0,0,0.35);}
   #search:focus{border-color:var(--gold);}
   #search::placeholder{color:#88a3bb;font-weight:500;}
-  .clear-btn{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;border:none;background:rgba(255,255,255,0.14);color:var(--chalk);font-size:1.2rem;line-height:1;cursor:pointer;display:none;align-items:center;justify-content:center;padding:0;}
+  .clear-btn{position:absolute;right:5px;top:50%;transform:translateY(-50%);width:26px;height:26px;border-radius:50%;border:none;background:rgba(255,255,255,0.14);color:var(--chalk);font-size:1rem;line-height:1;cursor:pointer;display:none;align-items:center;justify-content:center;padding:0;}
   .clear-btn.show{display:flex;}
   .clear-btn:active{background:rgba(255,255,255,0.28);}
   .hint{font-size:0.68rem;color:#8a978d;margin-top:6px;}
@@ -219,12 +225,25 @@
   <h1><svg class="logo" viewBox="0 0 100 100" width="26" height="26" aria-hidden="true"><circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" stroke-width="3.5"/><g transform="translate(50,50)"><circle r="21" fill="none" stroke="currentColor" stroke-width="3.5"/><path d="M0,-9.3 L8.8,-2.9 L5.5,7.5 L-5.5,7.5 L-8.8,-2.9 Z" fill="currentColor"/><line x1="0" y1="-9.3" x2="0" y2="-20" stroke="currentColor" stroke-width="3"/><line x1="8.8" y1="-2.9" x2="18.7" y2="-6.1" stroke="currentColor" stroke-width="3"/><line x1="5.5" y1="7.5" x2="11.6" y2="16" stroke="currentColor" stroke-width="3"/><line x1="-5.5" y1="7.5" x2="-11.6" y2="16" stroke="currentColor" stroke-width="3"/><line x1="-8.8" y1="-2.9" x2="-18.7" y2="-6.1" stroke="currentColor" stroke-width="3"/></g></svg>Rondo <span class="badge">WC 26</span></h1>
   <div class="sub">Search a code, number, or player. Tap a sticker, then act.</div>
   <div class="toolbar">
-    <button class="tbtn tbtn-accent" onclick="openModal('quickadd')">+ Quick add</button>
-    <button class="tbtn tbtn-accent" onclick="openModal('compare')">Compare</button>
-    <button class="tbtn" id="selectBtn" onclick="toggleSelectMode()">Select</button>
-    <button class="tbtn" onclick="openModal('export')">Export</button>
-    <button class="tbtn" onclick="openModal('import')">Import</button>
-    <button class="tbtn" onclick="resetAll()">Reset</button>
+    <button class="tbtn tbtn-accent" onclick="openModal('quickadd')" aria-label="Quick add" title="Quick add">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    </button>
+    <button class="tbtn tbtn-accent" onclick="openModal('compare')" aria-label="Compare" title="Compare">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+    </button>
+    <span class="tbar-div"></span>
+    <button class="tbtn" id="selectBtn" onclick="toggleSelectMode()" aria-label="Select" title="Select multiple">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+    </button>
+    <button class="tbtn" onclick="openModal('export')" aria-label="Export" title="Export / backup">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    </button>
+    <button class="tbtn" onclick="openModal('import')" aria-label="Import" title="Import">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+    </button>
+    <button class="tbtn tbtn-danger" onclick="resetAll()" aria-label="Reset" title="Reset to defaults">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+    </button>
   </div>
   <div class="search-wrap">
     <input id="search" type="text" inputmode="text" autocomplete="off" oninput="lookup(this.value)" placeholder="Try: salah · EGY 17 · messi · tur 16">
@@ -252,7 +271,7 @@
   <button class="bulk-cancel" onclick="exitSelectMode()">Done</button>
 </div>
 
-<footer>Tap a sticker for a verdict and action. Trade marks a dupe as traded; Got it moves a want into your collection. Export often so you do not lose changes.<br><br><span class="disclaimer">Rondo is an unofficial fan-made tracker. Not affiliated with or endorsed by Panini or FIFA. All trademarks belong to their respective owners.</span><br><span class="version">rondo-2026.06.18-153001</span></footer>
+<footer>Tap a sticker for a verdict and action. Trade marks a dupe as traded; Got it moves a want into your collection. Export often so you do not lose changes.<br><br><span class="disclaimer">Rondo is an unofficial fan-made tracker. Not affiliated with or endorsed by Panini or FIFA. All trademarks belong to their respective owners.</span><br><span class="version">rondo-2026.06.18-153808</span></footer>
 
 <div class="modal" id="modal">
   <div class="modal-card">
@@ -843,15 +862,14 @@ function toggleSelectMode(){ if(selectMode)exitSelectMode(); else enterSelectMod
 function enterSelectMode(){
   selectMode=true;selection={};
   document.body.className=(document.body.className+' selectmode').trim();
-  document.getElementById('selectBtn').className='tbtn tbtn-accent';
-  document.getElementById('selectBtn').textContent='Selecting';
+  document.getElementById('selectBtn').className='tbtn on';
   result.className='';result.innerHTML='';
   updateBulkBar();
 }
 function exitSelectMode(){
   selectMode=false;clearSelection();
   document.body.className=document.body.className.replace(/\bselectmode\b/,'').replace(/\s+/g,' ').trim();
-  var b=document.getElementById('selectBtn');b.className='tbtn';b.textContent='Select';
+  document.getElementById('selectBtn').className='tbtn';
   document.getElementById('bulkbar').className='bulkbar';
 }
 function clearSelection(){
