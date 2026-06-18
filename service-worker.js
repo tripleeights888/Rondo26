@@ -1,7 +1,7 @@
 // Offline cache for Rondo. The registration in the page checks for updates
 // on every open; when this file changes, the new version activates and the
-// page reloads automatically. Bump CACHE_VERSION on each release.
-const CACHE_VERSION = 'rondo-v2';
+// page reloads automatically. CACHE_VERSION is stamped automatically at build.
+const CACHE_VERSION = 'rondo-2026.06.18-150819';
 const ASSETS = [
   './',
   './index.html',
@@ -12,7 +12,6 @@ const ASSETS = [
 ];
 
 self.addEventListener('install', function (e) {
-  // Activate this new worker immediately rather than waiting for old tabs to close.
   e.waitUntil(
     caches.open(CACHE_VERSION).then(function (cache) {
       return cache.addAll(ASSETS);
@@ -30,8 +29,6 @@ self.addEventListener('activate', function (e) {
   );
 });
 
-// Network-first: always try the network so updates show up, fall back to
-// cache only when offline. The page itself is never served stale when online.
 self.addEventListener('fetch', function (e) {
   if (e.request.method !== 'GET') return;
   e.respondWith(
@@ -47,7 +44,6 @@ self.addEventListener('fetch', function (e) {
   );
 });
 
-// Allow the page to tell a waiting worker to take over right away.
 self.addEventListener('message', function (e) {
   if (e.data === 'SKIP_WAITING') self.skipWaiting();
 });
