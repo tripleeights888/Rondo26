@@ -1345,7 +1345,34 @@ renderAll();
 </script>
 
 <script>
-if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("./service-worker.js").catch(function(){});});}
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('./service-worker.js').then(function (reg) {
+      // Check for a new version every time the app opens.
+      reg.update();
+      // When a new worker is found and finishes installing, tell it to activate.
+      reg.addEventListener('updatefound', function () {
+        var nw = reg.installing;
+        if (!nw) return;
+        nw.addEventListener('statechange', function () {
+          if (nw.state === 'installed' && navigator.serviceWorker.controller) {
+            nw.postMessage('SKIP_WAITING');
+          }
+        });
+      });
+    }).catch(function () {});
+
+    // When the active worker changes (new version took over), reload once
+    // so the user immediately sees the update. Guarded to avoid reload loops.
+    var refreshed = false;
+    navigator.serviceWorker.addEventListener('controllerchange', function () {
+      if (refreshed) return;
+      refreshed = true;
+      window.location.reload();
+    });
+  });
+}
 </script>
+
 </body>
 </html>

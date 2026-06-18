@@ -1,6 +1,7 @@
-// Simple offline cache for the Panini Trade Manager.
-// Bump CACHE_VERSION whenever you upload a new index.html to force an update.
-const CACHE_VERSION = 'panini-v1';
+// Offline cache for Rondo. The registration in the page checks for updates
+// on every open; when this file changes, the new version activates and the
+// page reloads automatically. Bump CACHE_VERSION on each release.
+const CACHE_VERSION = 'rondo-v2';
 const ASSETS = [
   './',
   './index.html',
@@ -11,6 +12,7 @@ const ASSETS = [
 ];
 
 self.addEventListener('install', function (e) {
+  // Activate this new worker immediately rather than waiting for old tabs to close.
   e.waitUntil(
     caches.open(CACHE_VERSION).then(function (cache) {
       return cache.addAll(ASSETS);
@@ -28,7 +30,8 @@ self.addEventListener('activate', function (e) {
   );
 });
 
-// Network-first for the page so updates show up, falling back to cache offline.
+// Network-first: always try the network so updates show up, fall back to
+// cache only when offline. The page itself is never served stale when online.
 self.addEventListener('fetch', function (e) {
   if (e.request.method !== 'GET') return;
   e.respondWith(
@@ -42,4 +45,9 @@ self.addEventListener('fetch', function (e) {
       });
     })
   );
+});
+
+// Allow the page to tell a waiting worker to take over right away.
+self.addEventListener('message', function (e) {
+  if (e.data === 'SKIP_WAITING') self.skipWaiting();
 });
