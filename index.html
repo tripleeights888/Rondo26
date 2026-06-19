@@ -78,7 +78,27 @@
   .qa-nums-row{display:flex;gap:8px;}
   .qa-nums-row input{flex:1;min-width:0;font-size:1.1rem;padding:12px 14px;border-radius:9px;border:2px solid var(--line);background:rgba(0,0,0,0.4);color:var(--chalk);font-weight:700;outline:none;}
   .qa-nums-row input:focus{border-color:var(--gold);}
-  .qa-nums-row button{font-size:0.88rem;font-weight:800;padding:0 16px;border-radius:9px;border:none;background:var(--gold);color:#1a1303;cursor:pointer;white-space:nowrap;}
+  .qa-addnum{font-size:0.95rem;font-weight:800;padding:0 20px;border-radius:9px;border:none;background:var(--gold);color:#1a1303;cursor:pointer;white-space:nowrap;}
+  .qa-addnum:active{transform:scale(0.96);}
+  .qa-pending{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin-top:11px;min-height:34px;}
+  .qa-pending-hint{font-size:0.78rem;color:var(--chalk-dim);font-style:italic;line-height:1.4;}
+  .qa-chip{display:inline-flex;align-items:center;gap:5px;background:var(--have-bg);color:var(--have);border:1px solid var(--have);border-radius:8px;padding:6px 4px 6px 10px;font-size:0.95rem;font-weight:800;}
+  .qa-chip-tap{display:inline-flex;align-items:center;gap:5px;cursor:pointer;}
+  .qa-chip-dot{display:inline-block;width:11px;height:11px;border-radius:50%;border:1px solid rgba(255,255,255,0.4);}
+  .qa-chip.tinted{border-color:var(--gold);}
+  .qa-chip-x{font-size:1.05rem;opacity:0.6;line-height:1;cursor:pointer;padding:0 6px 0 2px;}
+  .qa-chip-x:active{opacity:1;}
+  .qa-picker{flex-basis:100%;margin-top:4px;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:10px;padding:10px;}
+  .qa-picker-label{font-size:0.72rem;font-weight:800;color:var(--gold);text-transform:uppercase;letter-spacing:0.03em;margin-bottom:7px;}
+  .qa-swatches{display:flex;flex-wrap:wrap;gap:7px;}
+  .qa-swatch{width:30px;height:30px;border-radius:8px;border:2px solid rgba(255,255,255,0.25);cursor:pointer;padding:0;position:relative;}
+  .qa-swatch.on{border-color:var(--gold);box-shadow:0 0 0 2px rgba(213,176,72,0.4);}
+  .qa-swatch.on::after{content:'✓';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:0.8rem;font-weight:900;text-shadow:0 0 3px rgba(0,0,0,0.8);}
+  .qa-counter{font-size:0.82rem;font-weight:800;color:#1a1303;background:var(--gold);border-radius:7px;padding:5px 11px;margin-right:2px;}
+  .qa-commit-row{margin-top:12px;}
+  .qa-commit{width:100%;font-size:0.98rem;font-weight:800;padding:13px;border-radius:11px;border:none;background:var(--gold);color:#1a1303;cursor:pointer;box-shadow:0 4px 14px rgba(213,176,72,0.3);}
+  .qa-commit.dim{opacity:0.4;box-shadow:none;}
+  .qa-commit:active{transform:scale(0.98);}
   .qa-feedback{margin-top:12px;min-height:54px;}
   .qa-card{border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:2px;}
   .qa-card .qwho{font-size:0.72rem;text-transform:uppercase;letter-spacing:0.05em;opacity:0.85;}
@@ -320,7 +340,7 @@
   <button class="bulk-cancel" onclick="exitSelectMode()">Done</button>
 </div>
 
-<footer>Tap a sticker for a verdict and action. Trade marks a dupe as traded; Got it moves a want into your collection. Export often so you do not lose changes.<br><br><span class="disclaimer">Rondo is an unofficial fan-made tracker. Not affiliated with or endorsed by Panini or FIFA. All trademarks belong to their respective owners.</span><br><span class="version">rondo-2026.06.19-161629</span></footer>
+<footer>Tap a sticker for a verdict and action. Trade marks a dupe as traded; Got it moves a want into your collection. Export often so you do not lose changes.<br><br><span class="disclaimer">Rondo is an unofficial fan-made tracker. Not affiliated with or endorsed by Panini or FIFA. All trademarks belong to their respective owners.</span><br><span class="version">rondo-2026.06.19-214424</span></footer>
 
 <div class="modal" id="modal">
   <div class="modal-card">
@@ -1037,7 +1057,7 @@ function openModal(mode){
                  '<button class="b-ghost" onclick="closeModal()">Cancel</button>';
   }else if(mode==='quickadd'){
     t.textContent='Quick add a pile';
-    d.textContent='Type the team code, then all the numbers from that pile (like 8 9 10). Commit files them: new ones to Stick It, repeats to Trade. Then grab your next pile.';
+    d.textContent='Type the team code. Then add each sticker number from the pile (tap Add or hit return). Commit files them all: new ones to Stick It, repeats to Trade.';
     ta.style.display='none';
     cu.style.display='block';
     cu.innerHTML='<div class="qa-team-row">'+
@@ -1046,13 +1066,16 @@ function openModal(mode){
       '<span id="qa-teamname" class="qa-teamname"></span></div>'+
       '<div class="qa-nums-row">'+
       '<input id="qa-nums" type="text" inputmode="numeric" autocomplete="off" '+
-      'placeholder="Numbers, e.g. 8 9 10" onkeydown="if(event.key===\'Enter\')quickAddBatch()">'+
-      '<button onclick="quickAddBatch()">Commit pile</button></div>'+
+      'placeholder="Number" onkeydown="qaNumKey(event)" oninput="qaNumInput(event)">'+
+      '<button class="qa-addnum" onclick="qaAddNum()">Add</button></div>'+
+      '<div class="qa-pending" id="qa-pending"></div>'+
+      '<div class="qa-commit-row"><button class="qa-commit" id="qa-commit" onclick="quickAddBatch()">Commit pile</button></div>'+
       '<div class="qa-feedback" id="qa-feedback"></div>'+
       '<div class="qa-recent" id="qa-recent"></div>';
     ac.innerHTML='<button class="b-ghost" onclick="closeModal()">Done</button>';
+    qaPending=[];qaPickerIdx=-1;
     setTimeout(function(){var qi=document.getElementById('qa-team');if(qi&&qi.focus)qi.focus();},100);
-    renderQaRecent();
+    renderQaPending();renderQaRecent();
   }else if(mode==='compare'){
     t.textContent='Compare with a friend';
     d.textContent='Paste a friend\'s list (their wants, or their full collection text). It shows what you can give them and what they have that you need.';
@@ -1171,6 +1194,76 @@ function addOneSticker(code,val){
   }
 }
 // Commit a whole pile: one team code + a list of numbers.
+var qaPending=[]; // staged stickers for the current pile: [{val, color}]
+var qaPickerIdx=-1; // which staged chip's color picker is open
+function qaAddNum(){
+  var ni=document.getElementById('qa-nums');
+  var ti=document.getElementById('qa-team');
+  var code=(ti.value||'').trim().toUpperCase();
+  var raw=(ni.value||'').toUpperCase().trim();
+  if(!raw)return;
+  // support pasting/typing several at once too (space or comma separated)
+  var tokens=raw.match(/CC\d+|\d+/g)||[];
+  for(var i=0;i<tokens.length;i++){
+    var tk=tokens[i];
+    var val=(code==='CC')?((/^CC/.test(tk))?tk:('CC'+tk)):parseInt(tk.replace(/\D/g,''),10);
+    if(val==='CC'||(typeof val==='number'&&isNaN(val)))continue;
+    qaPending.push({val:val,color:'white'}); // default base; tap to set special
+  }
+  ni.value='';qaPickerIdx=-1;renderQaPending();
+  if(ni.focus)ni.focus(); // keep focus so the number pad stays up
+}
+function qaNumKey(e){
+  if(e.key==='Enter'){e.preventDefault();qaAddNum();}
+}
+function qaNumInput(e){
+  // if the keypad offers space/comma/enter, treat them as "add"
+  var v=e.target.value;
+  if(/[ ,\n]/.test(v)){
+    e.target.value=v.replace(/[ ,\n].*$/,''); // keep the part before the separator
+    qaAddNum();
+  }
+}
+function removeQaNum(idx){
+  qaPending.splice(idx,1);if(qaPickerIdx===idx)qaPickerIdx=-1;renderQaPending();
+}
+function qaTogglePicker(idx){
+  qaPickerIdx=(qaPickerIdx===idx)?-1:idx;renderQaPending();
+}
+function qaSetColor(idx,key){
+  if(qaPending[idx])qaPending[idx].color=key;
+  qaPickerIdx=-1;renderQaPending();
+}
+function renderQaPending(){
+  var box=document.getElementById('qa-pending');if(!box)return;
+  var commit=document.getElementById('qa-commit');
+  var n=qaPending.length;
+  if(!n){
+    box.innerHTML='<span class="qa-pending-hint">Tap Add (or hit return) after each number. Tap a chip to mark a special color.</span>';
+    if(commit){commit.className='qa-commit dim';commit.textContent='Commit pile';}
+    return;
+  }
+  if(commit){commit.className='qa-commit';commit.textContent='Commit pile ('+n+')';}
+  var html='<span class="qa-counter">'+n+' staged</span>';
+  html+=qaPending.map(function(o,i){
+    var col=o.color||'white';
+    var dot=(col!=='white')?('<span class="qa-chip-dot" style="background:'+COLORS[col].c+'"></span>'):'';
+    return '<span class="qa-chip'+(col!=='white'?' tinted':'')+'">'+
+      '<span class="qa-chip-tap" onclick="qaTogglePicker('+i+')">'+dot+o.val+'</span>'+
+      '<span class="qa-chip-x" onclick="removeQaNum('+i+')">&times;</span></span>';
+  }).join('');
+  // inline color picker for the selected chip
+  if(qaPickerIdx>=0 && qaPending[qaPickerIdx]){
+    var cur=qaPending[qaPickerIdx].color||'white';
+    var sw=COLOR_ORDER.map(function(k){
+      return '<button class="qa-swatch'+(k===cur?' on':'')+'" title="'+COLORS[k].label+'" '+
+        'style="background:'+COLORS[k].c+'" onclick="qaSetColor('+qaPickerIdx+',\''+k+'\')"></button>';
+    }).join('');
+    html+='<div class="qa-picker"><div class="qa-picker-label">Color for '+qaPending[qaPickerIdx].val+'</div>'+
+      '<div class="qa-swatches">'+sw+'</div></div>';
+  }
+  box.innerHTML=html;
+}
 function quickAddBatch(){
   var ti=document.getElementById('qa-team');
   var ni=document.getElementById('qa-nums');
@@ -1180,21 +1273,21 @@ function quickAddBatch(){
   if(!NAMES[code] && ['INTRO','MUSEUM','CC','LOGO'].indexOf(code)===-1){
     fb.innerHTML=qaCard('bad','Unknown team code',code,'That is not a team in this album.');return;
   }
-  // parse numbers: split on spaces, commas. Handle CC tokens for the CC team.
-  var raw=(ni.value||'').toUpperCase();
-  var tokens=raw.match(/CC\d+|\d+/g)||[];
-  if(!tokens.length){fb.innerHTML=qaCard('bad','No numbers','','Type the pile\'s numbers, like 8 9 10.');return;}
+  // include any number still sitting in the field that wasn't added yet
+  if((ni.value||'').trim())qaAddNum();
+  var tokens=qaPending.slice();
+  if(!tokens.length){fb.innerHTML=qaCard('bad','No numbers staged','','Add the pile\'s numbers first, then commit.');return;}
   var results={newList:[],dupeList:[],badList:[]};
+  var coloredCount=0;
   for(var i=0;i<tokens.length;i++){
-    var tk=tokens[i];
-    var val;
-    if(code==='CC'){val=(/^CC/.test(tk))?tk:('CC'+tk);}
-    else{val=parseInt(tk.replace(/\D/g,''),10);}
+    var val=tokens[i].val;
+    var col=tokens[i].color||'white';
     var r=addOneSticker(code,val);
-    var shown=(code==='CC')?val:val;
-    if(r==='new')results.newList.push(shown);
-    else if(r==='dupe')results.dupeList.push(shown);
-    else results.badList.push(shown);
+    // apply color tag (only stored if non-white). Tag whichever copy we filed.
+    if(col!=='white'){setColor(code,val,col);coloredCount++;}
+    if(r==='new')results.newList.push(val);
+    else if(r==='dupe')results.dupeList.push(val);
+    else results.badList.push(val);
   }
   saveState();renderAll();renderQaRecent();
   // build a summary card
@@ -1202,10 +1295,12 @@ function quickAddBatch(){
   if(results.newList.length)parts.push('<div class="qa-sumline new"><b>'+results.newList.length+' new</b> → Stick It: '+results.newList.join(', ')+'</div>');
   if(results.dupeList.length)parts.push('<div class="qa-sumline dupe"><b>'+results.dupeList.length+' dupe'+(results.dupeList.length>1?'s':'')+'</b> → Trade: '+results.dupeList.join(', ')+'</div>');
   if(results.badList.length)parts.push('<div class="qa-sumline bad"><b>'+results.badList.length+' skipped</b> (out of range): '+results.badList.join(', ')+'</div>');
+  if(coloredCount)parts.push('<div class="qa-sumline color"><b>'+coloredCount+' color-tagged</b></div>');
   var nm=teamFullName(code);
-  fb.innerHTML='<div class="qa-card sum"><span class="qwho">'+nm+' pile committed</span>'+parts.join('')+'</div>';
+  var totalFiled=results.newList.length+results.dupeList.length+results.badList.length;
+  fb.innerHTML='<div class="qa-card sum"><span class="qwho">'+nm+' pile committed ('+totalFiled+' total)</span>'+parts.join('')+'</div>';
   // reset for next pile
-  ti.value='';ni.value='';qaTeamEcho();
+  ti.value='';ni.value='';qaPending=[];qaPickerIdx=-1;renderQaPending();qaTeamEcho();
   if(ti.focus)ti.focus();
 }
 function qaCard(cls,who,what,detail){
@@ -1543,7 +1638,17 @@ function renderTradeQR(){
   }
 }
 function countSpares(){
-  var n=0;for(var c in state.dupes){if(state.dupes[c])n+=state.dupes[c].length;}return n;
+  // Count available spares only: subtract any copies already traded away (given).
+  var n=0;
+  for(var c in state.dupes){
+    if(!state.dupes[c])continue;
+    var m=tally(state.dupes[c]);
+    for(var v in m){
+      var avail=m[v]-givenCount(c,(/^CC/.test(v)?v:parseInt(v,10)));
+      if(avail>0)n+=avail;
+    }
+  }
+  return n;
 }
 function buildTextList(data,kind){
   var lines=[];
