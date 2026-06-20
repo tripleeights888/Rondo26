@@ -102,6 +102,21 @@
   .th-chip.in{background:rgba(63,174,90,0.14);color:#7fd99a;}
   .th-chip.out{background:rgba(67,161,213,0.14);color:#8fcdf0;}
   .th-none{font-size:0.78rem;color:var(--chalk-dim);font-style:italic;}
+  .th-add{width:100%;background:rgba(213,176,72,0.14);border:1px solid var(--gold);color:var(--gold);border-radius:10px;padding:11px;font-weight:800;font-size:0.92rem;cursor:pointer;margin-bottom:12px;}
+  .th-add:active{transform:scale(0.98);}
+  .mt-form{display:flex;flex-direction:column;gap:13px;}
+  .mt-field{display:flex;flex-direction:column;gap:6px;}
+  .mt-lbl{font-size:0.72rem;font-weight:900;text-transform:uppercase;letter-spacing:0.04em;}
+  .mt-lbl.in{color:#7fd99a;}
+  .mt-lbl.out{color:#8fcdf0;}
+  .mt-ta{width:100%;box-sizing:border-box;min-height:64px;font-size:1rem;padding:11px;border-radius:9px;border:2px solid var(--line);background:rgba(0,0,0,0.4);color:var(--chalk);font-weight:600;outline:none;resize:vertical;font-family:inherit;}
+  .mt-ta:focus{border-color:var(--gold);}
+  .mt-preview{min-height:0;}
+  .mt-warn{font-size:0.8rem;color:#ffd9a0;background:rgba(213,176,72,0.12);border:1px solid var(--gold);border-radius:9px;padding:9px 11px;}
+  .mt-actions{display:flex;gap:8px;}
+  .mt-actions button{flex:1;font-size:0.95rem;font-weight:800;padding:13px;border-radius:11px;border:none;cursor:pointer;}
+  .mt-actions .b-primary{background:var(--gold);color:#1a1303;}
+  .mt-actions .b-ghost{background:rgba(255,255,255,0.12);color:var(--chalk);flex:0 0 auto;padding:13px 18px;}
   .xip-toggle label{display:flex;align-items:center;gap:6px;cursor:pointer;}
   .xip-list{display:flex;flex-direction:column;gap:6px;max-height:46vh;overflow-y:auto;}
   .xip-item{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:9px;padding:10px 11px;cursor:pointer;}
@@ -428,7 +443,7 @@
   <button class="bulk-cancel" onclick="exitSelectMode()">Done</button>
 </div>
 
-<footer>Tap a sticker for a verdict and action. Trade marks a dupe as traded; Got it moves a want into your collection. Export often so you do not lose changes.<br><br><span class="disclaimer">Rondo is an unofficial fan-made tracker. Not affiliated with or endorsed by Panini or FIFA. All trademarks belong to their respective owners.</span><br><span class="version">rondo-2026.06.20-034253</span></footer>
+<footer>Tap a sticker for a verdict and action. Trade marks a dupe as traded; Got it moves a want into your collection. Export often so you do not lose changes.<br><br><span class="disclaimer">Rondo is an unofficial fan-made tracker. Not affiliated with or endorsed by Panini or FIFA. All trademarks belong to their respective owners.</span><br><span class="version">rondo-2026.06.20-175624</span></footer>
 
 <div class="modal" id="modal">
   <div class="modal-card">
@@ -2109,11 +2124,12 @@ function tradeHistoryEntries(){
 function renderTradeHistory(){
   var cu=document.getElementById('modal-custom');if(!cu)return;
   var entries=tradeHistoryEntries();
+  var addBtn='<button class="th-add" onclick="openManualTrade()">+ Log a trade</button>';
   if(!entries.length){
-    cu.innerHTML='<div class="cmp-empty">No trades yet. When you complete a trade through Compare or QR Trade, it shows up here so you can review or reverse it.</div>';
+    cu.innerHTML=addBtn+'<div class="cmp-empty">No trades yet. Complete one through Compare or QR Trade, or tap "Log a trade" to record one you did in person.</div>';
     return;
   }
-  var html='<div class="th-list">';
+  var html=addBtn+'<div class="th-list">';
   entries.forEach(function(e){
     var d=new Date(e.when||0);
     var dateStr=isNaN(d.getTime())?'':(d.toLocaleDateString(undefined,{month:'short',day:'numeric'})+' '+d.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'}));
@@ -2122,7 +2138,7 @@ function renderTradeHistory(){
       return arr.map(function(k){var p=k.split('|');var lab=(p[0]==='CC')?p[1]:(p[0]+' '+p[1]);return '<span class="th-chip '+cls+'">'+lab+'</span>';}).join('');
     }
     html+='<div class="th-row">'+
-      '<div class="th-top"><span class="th-date">'+dateStr+'</span>'+
+      '<div class="th-top"><span class="th-date">'+dateStr+(e.manual?' · manual':'')+'</span>'+
         '<button class="th-undo" onclick="reverseTradeById(\''+e.id+'\')">Reverse</button></div>'+
       '<div class="th-side"><span class="th-lbl in">In</span>'+chips(e.recv,'in')+'</div>'+
       (e.give&&e.give.length?('<div class="th-side"><span class="th-lbl out">Out</span>'+chips(e.give,'out')+'</div>'):'')+
@@ -2130,6 +2146,51 @@ function renderTradeHistory(){
   });
   html+='</div>';
   cu.innerHTML=html;
+}
+function openManualTrade(){
+  var cu=document.getElementById('modal-custom');if(!cu)return;
+  cu.innerHTML='<div class="mt-form">'+
+    '<div class="mt-field"><label class="mt-lbl in">Stickers I received</label>'+
+      '<textarea id="mt-recv" class="mt-ta" placeholder="e.g. IRQ 5, EGY 8\nor one per line"></textarea></div>'+
+    '<div class="mt-field"><label class="mt-lbl out">Stickers I gave (optional)</label>'+
+      '<textarea id="mt-give" class="mt-ta" placeholder="e.g. MEX 6, MEX 8"></textarea></div>'+
+    '<div id="mt-preview" class="mt-preview"></div>'+
+    '<div class="mt-actions"><button class="b-primary" onclick="commitManualTrade()">Save trade</button>'+
+      '<button class="b-ghost" onclick="renderTradeHistory()">Cancel</button></div>'+
+    '</div>';
+  var rv=document.getElementById('mt-recv');if(rv&&rv.focus)rv.focus();
+}
+function commitManualTrade(){
+  var recvText=document.getElementById('mt-recv').value;
+  var giveText=document.getElementById('mt-give').value;
+  var recvParsed=parseList(recvText);
+  var giveParsed=parseList(giveText);
+  // turn parsed {code:[vals]} into key arrays
+  function toKeys(parsed){
+    var keys=[];
+    for(var c in parsed){ for(var i=0;i<parsed[c].length;i++){ keys.push(c+'|'+parsed[c][i]); } }
+    return keys;
+  }
+  var recv=toKeys(recvParsed), give=toKeys(giveParsed);
+  if(!recv.length && !give.length){ var pv=document.getElementById('mt-preview'); if(pv)pv.innerHTML='<div class="mt-warn">Enter at least one sticker you received or gave.</div>'; return; }
+  // Apply: received -> add (keeper by default; if already owned, becomes a spare),
+  // given -> mark as given away. Mirrors commitTrade but without the radio prompts.
+  recv.forEach(function(key){
+    var p=key.split('|');var c=p[0];var v=(c==='CC')?p[1]:parseInt(p[1],10);
+    var owned=state.have[c]&&inList(state.have[c],v);
+    if(owned){ if(!state.dupes[c])state.dupes[c]=[]; state.dupes[c].push(v); }
+    else { if(!state.have[c])state.have[c]=[]; state.have[c].push(v); }
+    if(state.wants[c])removeOne(state.wants[c],v);
+  });
+  give.forEach(function(key){
+    var p=key.split('|');var c=p[0];var v=(c==='CC')?p[1]:parseInt(p[1],10);
+    if(!state.given)state.given={};if(!state.given[c])state.given[c]={};
+    state.given[c][v]=(state.given[c][v]||0)+1;
+  });
+  state.log=state.log||[];
+  state.log.push({t:'trade',id:Date.now()+'_'+Math.floor(Math.random()*1000),recv:recv,give:give,when:Date.now(),manual:true});
+  saveState();renderAll();renderTradeHistory();
+  flash('Trade logged: '+recv.length+' in'+(give.length?(', '+give.length+' out'):''));
 }
 function openModalReplaced_placeholder(){}
 
