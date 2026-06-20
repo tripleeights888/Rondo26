@@ -24,6 +24,91 @@
   header{background:var(--pitch);padding:calc(2px + env(safe-area-inset-top)) 18px 12px;border-bottom:3px solid var(--gold);position:sticky;top:0;z-index:50;box-shadow:0 6px 18px rgba(0,0,0,0.4);}
   h1{font-size:1.25rem;font-weight:800;letter-spacing:-0.02em;display:flex;align-items:center;gap:9px;}
   h1 .logo{flex:0 0 auto;color:var(--chalk);}
+  .hdr-top{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+  .xg-btn{flex:0 0 auto;display:inline-flex;align-items:baseline;gap:1px;background:rgba(255,255,255,0.08);border:1px solid var(--gold);border-radius:9px;padding:6px 11px;cursor:pointer;font-weight:900;line-height:1;}
+  .xg-btn:active{transform:scale(0.95);}
+  .xg-x{color:var(--gold);font-size:0.95rem;font-style:italic;}
+  .xg-g{color:var(--chalk);font-size:1.05rem;}
+  .stat-grid{display:flex;flex-direction:column;gap:10px;}
+  .stat-hero{background:var(--card);border:1px solid var(--gold);border-radius:13px;padding:16px;text-align:center;}
+  .stat-hero .big{font-size:2.4rem;font-weight:900;color:var(--gold);line-height:1;}
+  .stat-hero .sub2{font-size:0.85rem;color:var(--chalk-dim);margin-top:5px;}
+  .stat-hero .bar{height:8px;background:rgba(0,0,0,0.35);border-radius:99px;margin-top:11px;overflow:hidden;}
+  .stat-hero .bar>span{display:block;height:100%;background:linear-gradient(90deg,var(--lightblue),var(--gold));border-radius:99px;}
+  .stat-row{display:flex;gap:10px;}
+  .stat-card{flex:1;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px;}
+  .stat-card .label{font-size:0.66rem;font-weight:800;letter-spacing:0.04em;text-transform:uppercase;color:var(--gold);margin-bottom:6px;}
+  .stat-card .val{font-size:1.3rem;font-weight:900;color:var(--chalk);line-height:1.1;}
+  .stat-card .val small{font-size:0.8rem;font-weight:700;color:var(--chalk-dim);}
+  .stat-card .note{font-size:0.72rem;color:var(--chalk-dim);margin-top:3px;}
+  .stat-block{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px;}
+  .stat-block .label{font-size:0.66rem;font-weight:800;letter-spacing:0.04em;text-transform:uppercase;color:var(--gold);margin-bottom:9px;}
+  .stat-chase{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 0;}
+  .stat-chase+.stat-chase{border-top:1px solid var(--line);}
+  .stat-chase .team{font-weight:800;color:var(--chalk);}
+  .stat-chase .miss{font-size:0.8rem;color:var(--lightblue);font-weight:700;}
+  .stat-colors{display:flex;flex-wrap:wrap;gap:8px;}
+  .stat-color{display:flex;align-items:center;gap:5px;font-size:0.8rem;color:var(--chalk);font-weight:700;}
+  .stat-cdot{width:11px;height:11px;border-radius:50%;border:1px solid rgba(255,255,255,0.4);}
+  .xi-block{background:linear-gradient(160deg,#0f3320,#0c2418);border-color:#1f5236;}
+  .xi-pitch{display:flex;flex-direction:column;gap:14px;padding:14px 6px 8px;background:repeating-linear-gradient(0deg,rgba(255,255,255,0.025) 0 28px,transparent 28px 56px);border-radius:10px;}
+  .xi-line{display:flex;justify-content:space-around;gap:6px;}
+  .xi-player{flex:0 0 auto;width:62px;display:flex;flex-direction:column;align-items:center;gap:2px;border-radius:8px;padding:7px 2px;position:relative;}
+  .xi-player.filled{background:rgba(255,255,255,0.08);border:1px solid var(--gold);cursor:pointer;}
+  .xi-player.empty{border:1px dashed rgba(255,255,255,0.18);opacity:0.5;}
+  .xi-name{font-size:0.72rem;font-weight:800;color:var(--chalk);max-width:58px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .xi-team{font-size:0.58rem;font-weight:700;color:var(--gold);letter-spacing:0.04em;}
+  .xi-dot{position:absolute;top:4px;right:4px;width:9px;height:9px;border-radius:50%;border:1px solid rgba(255,255,255,0.5);}
+  .xi-hint{font-size:0.68rem;color:var(--chalk-dim);text-align:center;margin-top:9px;font-style:italic;}
+  .xi-player.manual{border-color:var(--lightblue);}
+  .tappable{cursor:pointer;}
+  .fg-svg{width:100%;height:120px;display:block;}
+  .fg-foot{display:flex;justify-content:space-between;font-size:0.68rem;color:var(--chalk-dim);margin-top:4px;font-weight:700;}
+  .grp-list{display:flex;flex-direction:column;gap:7px;}
+  .grp-row{display:flex;align-items:center;gap:9px;}
+  .grp-let{width:16px;font-weight:900;color:var(--gold);font-size:0.85rem;}
+  .grp-bar{flex:1;height:8px;background:rgba(0,0,0,0.35);border-radius:99px;overflow:hidden;}
+  .grp-bar>span{display:block;height:100%;background:linear-gradient(90deg,var(--lightblue),var(--gold));border-radius:99px;}
+  .grp-pct{width:38px;text-align:right;font-size:0.76rem;font-weight:800;color:var(--chalk);}
+  .pl-add{display:flex;gap:7px;margin-bottom:12px;}
+  .pl-input{flex:1;min-width:0;font-size:1rem;padding:11px;border-radius:9px;border:2px solid var(--line);background:rgba(0,0,0,0.4);color:var(--chalk);font-weight:700;outline:none;}
+  .pl-input:focus{border-color:var(--gold);}
+  .pl-qty{flex:0 0 90px;}
+  .pl-addbtn{font-size:0.92rem;font-weight:800;padding:0 16px;border-radius:9px;border:none;background:var(--gold);color:#1a1303;cursor:pointer;}
+  .pl-total{font-size:0.82rem;color:var(--gold);font-weight:800;margin-bottom:10px;}
+  .pl-list{display:flex;flex-direction:column;gap:6px;}
+  .pl-row{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:9px;padding:9px 11px;}
+  .pl-rdate{flex:1;font-weight:700;color:var(--chalk);font-size:0.9rem;}
+  .pl-rqty{font-size:0.85rem;color:var(--lightblue);font-weight:800;}
+  .pl-del{background:rgba(217,83,79,0.15);border:none;color:#e88;border-radius:7px;width:28px;height:28px;font-size:1.1rem;cursor:pointer;}
+  .xip{display:flex;flex-direction:column;gap:10px;}
+  .xip-head{display:flex;align-items:center;justify-content:space-between;}
+  .xip-head b{font-size:1.05rem;color:var(--chalk);}
+  .xip-close{background:rgba(255,255,255,0.12);border:none;color:var(--chalk);border-radius:8px;padding:7px 13px;font-weight:700;cursor:pointer;}
+  .xip-toggle{font-size:0.8rem;color:var(--chalk-dim);}
+  .xip-search{width:100%;font-size:1rem;padding:11px 13px;border-radius:9px;border:2px solid var(--line);background:rgba(0,0,0,0.4);color:var(--chalk);font-weight:600;outline:none;box-sizing:border-box;}
+  .xip-search:focus{border-color:var(--gold);}
+  .xip-more{text-align:center;font-size:0.72rem;color:var(--chalk-dim);margin-top:7px;font-style:italic;}
+  .th-list{display:flex;flex-direction:column;gap:9px;}
+  .th-row{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:11px 12px;}
+  .th-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+  .th-date{font-size:0.78rem;color:var(--chalk-dim);font-weight:700;}
+  .th-undo{background:rgba(217,83,79,0.15);border:1px solid rgba(217,83,79,0.4);color:#e99;border-radius:7px;padding:5px 11px;font-size:0.76rem;font-weight:800;cursor:pointer;}
+  .th-side{display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin-top:5px;}
+  .th-lbl{font-size:0.64rem;font-weight:900;text-transform:uppercase;letter-spacing:0.04em;padding:2px 7px;border-radius:5px;}
+  .th-lbl.in{background:rgba(63,174,90,0.18);color:#7fd99a;}
+  .th-lbl.out{background:rgba(67,161,213,0.18);color:#8fcdf0;}
+  .th-chip{font-size:0.8rem;font-weight:800;padding:3px 8px;border-radius:6px;}
+  .th-chip.in{background:rgba(63,174,90,0.14);color:#7fd99a;}
+  .th-chip.out{background:rgba(67,161,213,0.14);color:#8fcdf0;}
+  .th-none{font-size:0.78rem;color:var(--chalk-dim);font-style:italic;}
+  .xip-toggle label{display:flex;align-items:center;gap:6px;cursor:pointer;}
+  .xip-list{display:flex;flex-direction:column;gap:6px;max-height:46vh;overflow-y:auto;}
+  .xip-item{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:9px;padding:10px 11px;cursor:pointer;}
+  .xip-item:active{background:rgba(255,255,255,0.06);}
+  .xip-name{flex:1;font-weight:700;color:var(--chalk);font-size:0.9rem;}
+  .xip-team{font-size:0.75rem;color:var(--gold);font-weight:700;}
+  .xip-clear{background:rgba(217,83,79,0.15);border:1px solid rgba(217,83,79,0.4);color:#e99;border-radius:9px;padding:10px;font-weight:700;cursor:pointer;}
   h1 .badge{font-size:0.58rem;font-weight:700;letter-spacing:0.08em;background:var(--gold);color:var(--ink);padding:3px 8px;border-radius:99px;text-transform:uppercase;}
   .sub{font-size:0.76rem;color:var(--chalk-dim);margin-top:3px;}
   .toolbar{display:flex;align-items:flex-start;gap:6px;margin-top:11px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:2px;}
@@ -282,7 +367,10 @@
 </head>
 <body>
 <header>
+  <div class="hdr-top">
   <h1><svg class="logo" viewBox="0 0 100 100" width="26" height="26" aria-hidden="true"><circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" stroke-width="3.5"/><g transform="translate(50,50)"><circle r="21" fill="none" stroke="currentColor" stroke-width="3.5"/><path d="M0,-9.3 L8.8,-2.9 L5.5,7.5 L-5.5,7.5 L-8.8,-2.9 Z" fill="currentColor"/><line x1="0" y1="-9.3" x2="0" y2="-20" stroke="currentColor" stroke-width="3"/><line x1="8.8" y1="-2.9" x2="18.7" y2="-6.1" stroke="currentColor" stroke-width="3"/><line x1="5.5" y1="7.5" x2="11.6" y2="16" stroke="currentColor" stroke-width="3"/><line x1="-5.5" y1="7.5" x2="-11.6" y2="16" stroke="currentColor" stroke-width="3"/><line x1="-8.8" y1="-2.9" x2="-18.7" y2="-6.1" stroke="currentColor" stroke-width="3"/></g></svg>Rondo <span class="badge">WC 26</span></h1>
+  <button class="xg-btn" onclick="openStats()" aria-label="Stats" title="Collection stats"><span class="xg-x">x</span><span class="xg-g">G</span></button>
+  </div>
   <div class="sub">Search a code, number, or player. Tap a sticker, then act.</div>
   <div class="toolbar">
     <button class="tbtn tbtn-accent" onclick="openModal('quickadd')" aria-label="Quick add" title="Quick add">
@@ -340,7 +428,7 @@
   <button class="bulk-cancel" onclick="exitSelectMode()">Done</button>
 </div>
 
-<footer>Tap a sticker for a verdict and action. Trade marks a dupe as traded; Got it moves a want into your collection. Export often so you do not lose changes.<br><br><span class="disclaimer">Rondo is an unofficial fan-made tracker. Not affiliated with or endorsed by Panini or FIFA. All trademarks belong to their respective owners.</span><br><span class="version">rondo-2026.06.19-214424</span></footer>
+<footer>Tap a sticker for a verdict and action. Trade marks a dupe as traded; Got it moves a want into your collection. Export often so you do not lose changes.<br><br><span class="disclaimer">Rondo is an unofficial fan-made tracker. Not affiliated with or endorsed by Panini or FIFA. All trademarks belong to their respective owners.</span><br><span class="version">rondo-2026.06.20-034253</span></footer>
 
 <div class="modal" id="modal">
   <div class="modal-card">
@@ -447,9 +535,9 @@ function clone(o){return JSON.parse(JSON.stringify(o));}
 function loadState(){
   try{
     var raw=(typeof localStorage!=='undefined')?localStorage.getItem(STORE_KEY):null;
-    if(raw){var p=JSON.parse(raw); if(p&&p.dupes&&p.wants&&p.have){if(!p.given)p.given={};if(!p.favs)p.favs={};if(!p.colors)p.colors={};return p;}}
+    if(raw){var p=JSON.parse(raw); if(p&&p.dupes&&p.wants&&p.have){if(!p.given)p.given={};if(!p.favs)p.favs={};if(!p.colors)p.colors={};if(!p.packLog)p.packLog=[];if(!p.xi)p.xi={};return p;}}
   }catch(e){}
-  return {dupes:clone(BASE.dupes),wants:clone(BASE.wants),have:clone(BASE.have),given:{},favs:{},colors:{},log:[]};
+  return {dupes:clone(BASE.dupes),wants:clone(BASE.wants),have:clone(BASE.have),given:{},favs:{},colors:{},log:[],packLog:[],xi:{}};
 }
 function saveState(){
   try{ if(typeof localStorage!=='undefined'){localStorage.setItem(STORE_KEY,JSON.stringify(state));} }catch(e){}
@@ -1008,6 +1096,382 @@ function bulkRemoveHave(){bulkApply(function(c,v){
 },'moved back to Want');}
 
 // ---- EXPORT / IMPORT ----
+function fullAlbumTotal(){
+  // total stickers in the album = every code's max number across NAMES + specials
+  var t=0;
+  for(var c in NAMES){ t+=Object.keys(NAMES[c]).length; }
+  return t;
+}
+function computeStats(){
+  var s={};
+  // owned (have) total and dupes total
+  var ownedUnique=0; for(var c in state.have){ ownedUnique+=state.have[c].length; }
+  var dupeTotal=0; for(var c in state.dupes){ if(state.dupes[c])dupeTotal+=state.dupes[c].length; }
+  var full=fullAlbumTotal();
+  s.owned=ownedUnique; s.full=full; s.pct=full?Math.round(ownedUnique/full*100):0;
+  s.dupes=dupeTotal;
+  // total stickers acquired (for pack estimate): unique owned + all dupes
+  s.acquired=ownedUnique+dupeTotal;
+  // packs: use manual log total if the user has logged any; otherwise estimate.
+  var logged=0;if(state.packLog)for(var pi=0;pi<state.packLog.length;pi++)logged+=(state.packLog[pi].packs||0);
+  s.loggedPacks=logged;
+  s.packsLogged=logged>0;
+  s.packs=logged>0?logged:Math.round(s.acquired/7);
+  // per-team completion
+  var teams=[]; var completedCount=0;
+  for(var code in NAMES){
+    var total=Object.keys(NAMES[code]).length;
+    var have=state.have[code]?state.have[code].length:0;
+    if(have>=total && total>0)completedCount++;
+    if(have<total)teams.push({code:code,have:have,total:total,miss:total-have});
+  }
+  s.completedTeams=completedCount;
+  s.totalTeams=Object.keys(NAMES).length;
+  // closest to complete: fewest missing (but >0), take 2
+  teams.sort(function(a,b){return a.miss-b.miss;});
+  s.chase=teams.slice(0,2);
+  // top country owned (most stickers held)
+  var topCode=null,topHave=-1;
+  for(var c2 in state.have){ if(state.have[c2].length>topHave){topHave=state.have[c2].length;topCode=c2;} }
+  s.topCountry=topCode?{code:topCode,have:topHave}:null;
+  // colors owned (only tiers that exist), excluding white
+  var colorCounts={};
+  for(var cc in state.have){
+    for(var j=0;j<state.have[cc].length;j++){
+      var col=colorOf(cc,state.have[cc][j]);
+      if(col!=='white')colorCounts[col]=(colorCounts[col]||0)+1;
+    }
+  }
+  s.colors=colorCounts;
+  // rarest pull: highest tier (by COLOR_ORDER position) that you own at least one of
+  var rarest=null;
+  for(var k=COLOR_ORDER.length-1;k>=1;k--){ // skip white at index 0
+    if(colorCounts[COLOR_ORDER[k]]){rarest=COLOR_ORDER[k];break;}
+  }
+  s.rarest=rarest;
+  // per-group completion (A-L)
+  s.groups=[];
+  for(var gi=0;gi<GROUP_ORDER.length;gi++){
+    var g=GROUP_ORDER[gi];var codes=GROUPS[g];
+    var gtot=0,ghave=0;
+    for(var ci=0;ci<codes.length;ci++){
+      var cc2=codes[ci];if(!NAMES[cc2])continue;
+      gtot+=Object.keys(NAMES[cc2]).length;
+      ghave+=state.have[cc2]?state.have[cc2].length:0;
+    }
+    s.groups.push({g:g,have:ghave,total:gtot,pct:gtot?Math.round(ghave/gtot*100):0});
+  }
+  return s;
+}
+function openStats(){ openModal('stats'); }
+// Infer a player's position from their sticker number, using the Panini
+// convention that players are listed GK -> DEF -> MID -> FWD within a team.
+// Slot 1 = Team Logo, 13 = Team Photo (skipped). 18 players across 2-12, 14-20.
+function inferPosition(code,val){
+  if(typeof val!=='number')return null;
+  if(val===1||val===13)return null; // logo / photo, not a player
+  // Panini orders players by position within a team:
+  //  2      = goalkeeper
+  //  3-7    = defenders
+  //  8-12   = midfielders
+  //  14-20  = forwards / attackers
+  if(val===2)return 'GK';
+  if(val>=3&&val<=7)return 'DEF';
+  if(val>=8&&val<=12)return 'MID';
+  if(val>=14&&val<=20)return 'FWD';
+  return null;
+}
+function colorRank(code,val){
+  var col=colorOf(code,val);
+  return COLOR_ORDER.indexOf(col); // higher index = rarer
+}
+function buildStartingXI(){
+  // Gather every owned player with a non-white color, grouped by position,
+  // sorted by rarity (rarest first). Then fill a 4-4-2.
+  var pools={GK:[],DEF:[],MID:[],FWD:[]};
+  for(var code in state.have){
+    for(var i=0;i<state.have[code].length;i++){
+      var val=state.have[code][i];
+      var pos=inferPosition(code,val);
+      if(!pos)continue;
+      var col=colorOf(code,val);
+      if(col==='white')continue; // only rare pulls earn a place in the XI
+      var rank=COLOR_ORDER.indexOf(col);
+      var nm=(NAMES[code]&&NAMES[code][val])?NAMES[code][val]:(code+' '+val);
+      pools[pos].push({code:code,val:val,name:nm,rank:rank,color:col});
+    }
+  }
+  // sort each pool by rarity desc, then keep best per position
+  for(var p in pools){pools[p].sort(function(a,b){return b.rank-a.rank;});}
+  var need={GK:1,DEF:4,MID:4,FWD:2};
+  var xi={};
+  for(var pos2 in need){ xi[pos2]=pools[pos2].slice(0,need[pos2]); }
+  // Apply manual overrides: state.xi maps "POS-slot" -> {code,val} (or null to clear).
+  if(state.xi){
+    for(var key in state.xi){
+      var parts=key.split('-');var pos3=parts[0];var slot=parseInt(parts[1],10);
+      if(!xi[pos3])continue;
+      var ov=state.xi[key];
+      if(ov===null){ if(xi[pos3][slot])xi[pos3][slot]=undefined; continue; }
+      var c=ov.code,v=ov.val;
+      var col=colorOf(c,v);
+      var nm=(NAMES[c]&&NAMES[c][v])?NAMES[c][v]:(c+' '+v);
+      xi[pos3][slot]={code:c,val:v,name:nm,rank:COLOR_ORDER.indexOf(col),color:col,manual:true};
+    }
+  }
+  return xi;
+}
+function renderStartingXI(){
+  var xi=buildStartingXI();
+  function line(label,arr,slots){
+    var cells='';
+    for(var i=0;i<slots;i++){
+      var pl=arr[i];
+      if(pl){
+        var col=pl.color;
+        var dot=(col!=='white')?('<span class="xi-dot" style="background:'+COLORS[col].c+'"></span>'):'';
+        var short=pl.name.split(' ').slice(-1)[0]; // last name
+        cells+='<div class="xi-player filled'+(pl.manual?' manual':'')+'" onclick="openXiPicker(\''+label+'\','+i+')" title="'+pl.name+' ('+pl.code+' '+pl.val+')">'+dot+
+          '<span class="xi-name">'+short+'</span><span class="xi-team">'+pl.code+'</span></div>';
+      }else{
+        cells+='<div class="xi-player empty" onclick="openXiPicker(\''+label+'\','+i+')"><span class="xi-name">+</span></div>';
+      }
+    }
+    return '<div class="xi-line" data-pos="'+label+'">'+cells+'</div>';
+  }
+  // pitch lines top (FWD) to bottom (GK)
+  return '<div class="xi-pitch">'+
+    line('FWD',xi.FWD,2)+
+    line('MID',xi.MID,4)+
+    line('DEF',xi.DEF,4)+
+    line('GK',xi.GK,1)+
+    '</div>';
+}
+// candidates for a position = owned players whose inferred position matches,
+// plus (optionally) any owned player if the user wants to override position too.
+function xiCandidates(pos){
+  var list=[];
+  for(var code in state.have){
+    for(var i=0;i<state.have[code].length;i++){
+      var val=state.have[code][i];
+      if(inferPosition(code,val)!==pos)continue;
+      var col=colorOf(code,val);
+      var nm=(NAMES[code]&&NAMES[code][val])?NAMES[code][val]:(code+' '+val);
+      list.push({code:code,val:val,name:nm,color:col,rank:COLOR_ORDER.indexOf(col)});
+    }
+  }
+  list.sort(function(a,b){return b.rank-a.rank;});
+  return list;
+}
+var xiPickCtx={pos:null,slot:null,showAll:false,q:''};
+function openXiPicker(pos,slot){
+  xiPickCtx={pos:pos,slot:slot,showAll:false,q:''};
+  renderXiPicker();
+}
+function xiSearch(v){
+  xiPickCtx.q=v||'';
+  renderXiPickerList(); // update just the list, keep the input focused
+}
+function renderXiPicker(){
+  var cu=document.getElementById('modal-custom');
+  var pos=xiPickCtx.pos;
+  var posName={GK:'Goalkeeper',DEF:'Defender',MID:'Midfielder',FWD:'Forward'}[pos];
+  var html='<div class="xip"><div class="xip-head"><b>Pick a '+posName+'</b>'+
+    '<button class="xip-close" onclick="renderStats()">Back</button></div>';
+  html+='<input id="xip-search" class="xip-search" type="text" autocomplete="off" '+
+    'placeholder="Search name or team (e.g. messi, ARG)" value="'+(xiPickCtx.q||'').replace(/"/g,'&quot;')+'" oninput="xiSearch(this.value)">';
+  html+='<div class="xip-toggle"><label><input type="checkbox" '+(xiPickCtx.showAll?'checked':'')+' onchange="xiToggleAll(this.checked)"> Show all my players (any position)</label></div>';
+  html+='<div id="xip-listwrap"></div>';
+  html+='<button class="xip-clear" onclick="clearXiSlot()">Clear this slot</button></div>';
+  cu.innerHTML=html;
+  renderXiPickerList();
+  var si=document.getElementById('xip-search');if(si&&si.focus)si.focus();
+}
+function renderXiPickerList(){
+  var wrap=document.getElementById('xip-listwrap');if(!wrap)return;
+  var cands=xiPickCtx.showAll?xiCandidatesAll():xiCandidates(xiPickCtx.pos);
+  var q=deaccent((xiPickCtx.q||'').toLowerCase().trim());
+  if(q){
+    cands=cands.filter(function(c){
+      var nm=deaccent((c.name||'').toLowerCase());
+      var tm=(c.code||'').toLowerCase();
+      return nm.indexOf(q)>-1 || tm.indexOf(q)>-1 || (tm+' '+c.val).indexOf(q)>-1;
+    });
+  }
+  if(!cands.length){
+    wrap.innerHTML='<div class="cmp-empty">'+(q?'No players match "'+xiPickCtx.q+'".':'No owned players found for this slot.')+'</div>';
+    return;
+  }
+  var html='<div class="xip-list">';
+  cands.slice(0,80).forEach(function(c){
+    var dot=(c.color!=='white')?('<span class="xi-dot" style="position:static;background:'+COLORS[c.color].c+'"></span>'):'';
+    html+='<div class="xip-item" onclick="setXiSlot(\''+c.code+'\','+c.val+')">'+dot+
+      '<span class="xip-name">'+c.name+'</span><span class="xip-team">'+c.code+' '+c.val+'</span></div>';
+  });
+  html+='</div>';
+  if(cands.length>80)html+='<div class="xip-more">Showing first 80. Keep typing to narrow.</div>';
+  wrap.innerHTML=html;
+}
+function xiCandidatesAll(){
+  var list=[];
+  for(var code in state.have){
+    for(var i=0;i<state.have[code].length;i++){
+      var val=state.have[code][i];if(val===1||val===13)continue;
+      var col=colorOf(code,val);
+      var nm=(NAMES[code]&&NAMES[code][val])?NAMES[code][val]:(code+' '+val);
+      list.push({code:code,val:val,name:nm,color:col,rank:COLOR_ORDER.indexOf(col)});
+    }
+  }
+  list.sort(function(a,b){return b.rank-a.rank;});
+  return list;
+}
+function xiToggleAll(on){xiPickCtx.showAll=on;renderXiPicker();}
+function setXiSlot(code,val){
+  if(!state.xi)state.xi={};
+  state.xi[xiPickCtx.pos+'-'+xiPickCtx.slot]={code:code,val:parseInt(val,10)};
+  saveState();renderStats();
+}
+function clearXiSlot(){
+  if(!state.xi)state.xi={};
+  state.xi[xiPickCtx.pos+'-'+xiPickCtx.slot]=null; // explicit empty
+  saveState();renderStats();
+}
+function renderStats(){
+  var cu=document.getElementById('modal-custom');
+  var s=computeStats();
+  var html='<div class="stat-grid">';
+  // hero: completion
+  html+='<div class="stat-hero"><div class="big">'+s.pct+'%</div>'+
+    '<div class="sub2">'+s.owned+' of '+s.full+' stickers collected</div>'+
+    '<div class="bar"><span style="width:'+s.pct+'%"></span></div></div>';
+  // row: packs + completed teams
+  var tradeCount=tradeHistoryEntries().length;
+  html+='<div class="stat-row">'+
+    '<div class="stat-card tappable" onclick="openModal(\'packlog\')"><div class="label">Packs opened</div><div class="val">'+(s.packsLogged?s.packs:('~'+s.packs))+'</div><div class="note">'+(s.packsLogged?'logged · tap to edit':'estimated · tap to log')+'</div></div>'+
+    '<div class="stat-card"><div class="label">Teams done</div><div class="val">'+s.completedTeams+' <small>/ '+s.totalTeams+'</small></div><div class="note">fully completed</div></div>'+
+    '</div>';
+  // row: top country + rarest
+  var topStr=s.topCountry?(teamFullName(s.topCountry.code)+' <small>('+s.topCountry.have+')</small>'):'—';
+  var rareStr=s.rarest?('<span class="stat-cdot" style="background:'+COLORS[s.rarest].c+';display:inline-block;margin-right:5px"></span>'+COLORS[s.rarest].label.replace(/ \(.*\)/,'')):'Base only';
+  html+='<div class="stat-row">'+
+    '<div class="stat-card"><div class="label">Top country</div><div class="val" style="font-size:1.05rem">'+topStr+'</div></div>'+
+    '<div class="stat-card tappable" onclick="openModal(\'tradehistory\')"><div class="label">Trades</div><div class="val">'+tradeCount+'</div><div class="note">'+(tradeCount?'tap to review':'none yet')+'</div></div>'+
+    '</div>';
+  // row: rarest pull on its own
+  html+='<div class="stat-row">'+
+    '<div class="stat-card"><div class="label">Rarest pull</div><div class="val" style="font-size:1.05rem">'+rareStr+'</div></div>'+
+    '<div class="stat-card" style="visibility:hidden"></div>'+
+    '</div>';
+  // chase list
+  // Starting XI from rarest pulls
+  html+='<div class="stat-block xi-block"><div class="label">Your Starting XI · rarest pulls (4-4-2)</div>'+
+    renderStartingXI()+
+    '<div class="xi-hint">Your rarest owned player at each position. Tap a card for details.</div></div>';
+  if(s.chase.length){
+    html+='<div class="stat-block"><div class="label">Closest to complete</div>';
+    s.chase.forEach(function(t){
+      html+='<div class="stat-chase"><span class="team">'+teamFullName(t.code)+'</span>'+
+        '<span class="miss">'+t.miss+' to go ('+t.have+'/'+t.total+')</span></div>';
+    });
+    html+='</div>';
+  }
+  // per-group breakdown A-L
+  if(s.groups&&s.groups.length){
+    html+='<div class="stat-block"><div class="label">By group</div><div class="grp-list">';
+    s.groups.forEach(function(g){
+      html+='<div class="grp-row"><span class="grp-let">'+g.g+'</span>'+
+        '<span class="grp-bar"><span style="width:'+g.pct+'%"></span></span>'+
+        '<span class="grp-pct">'+g.pct+'%</span></div>';
+    });
+    html+='</div></div>';
+  }
+  // colors owned (only existing tiers)
+  var colorKeys=Object.keys(s.colors);
+  if(colorKeys.length){
+    html+='<div class="stat-block"><div class="label">Special colors owned</div><div class="stat-colors">';
+    COLOR_ORDER.forEach(function(k){
+      if(s.colors[k]){
+        html+='<span class="stat-color"><span class="stat-cdot" style="background:'+COLORS[k].c+'"></span>'+
+          COLORS[k].label.replace(/ \(.*\)/,'')+' '+s.colors[k]+'</span>';
+      }
+    });
+    html+='</div></div>';
+  }
+  // Form guide: packs opened over time (only if logged)
+  if(s.packsLogged){
+    html+='<div class="stat-block"><div class="label">Form guide · packs over time</div>'+
+      renderFormGuide()+
+      '<div class="xi-hint">Tap Packs opened above to add or edit sessions.</div></div>';
+  }
+  html+='</div>';
+  cu.innerHTML=html;
+}
+function renderFormGuide(){
+  var log=(state.packLog||[]).slice().sort(function(a,b){return (a.date||'').localeCompare(b.date||'');});
+  if(!log.length)return '<div class="cmp-empty">No sessions logged yet.</div>';
+  // build cumulative series
+  var cum=0,pts=[];
+  log.forEach(function(e){cum+=(e.packs||0);pts.push({date:e.date,cum:cum,packs:e.packs||0});});
+  var maxCum=cum||1;
+  var W=300,H=120,pad=8;
+  var n=pts.length;
+  var coords=pts.map(function(p,i){
+    var x=pad+(n===1?(W-2*pad)/2:(i/(n-1))*(W-2*pad));
+    var y=H-pad-(p.cum/maxCum)*(H-2*pad);
+    return {x:x,y:y,p:p};
+  });
+  var line=coords.map(function(c,i){return (i?'L':'M')+c.x.toFixed(1)+' '+c.y.toFixed(1);}).join(' ');
+  var area=line+' L'+coords[coords.length-1].x.toFixed(1)+' '+(H-pad)+' L'+coords[0].x.toFixed(1)+' '+(H-pad)+' Z';
+  var dots=coords.map(function(c){return '<circle cx="'+c.x.toFixed(1)+'" cy="'+c.y.toFixed(1)+'" r="3" fill="#D5B048"/>';}).join('');
+  return '<svg class="fg-svg" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none">'+
+    '<path d="'+area+'" fill="rgba(213,176,72,0.15)"/>'+
+    '<path d="'+line+'" fill="none" stroke="#D5B048" stroke-width="2"/>'+dots+
+    '</svg>'+
+    '<div class="fg-foot"><span>'+log[0].date+'</span><span>'+cum+' packs total</span><span>'+log[log.length-1].date+'</span></div>';
+}
+function renderPackLog(){
+  var cu=document.getElementById('modal-custom');
+  var log=(state.packLog||[]).slice().sort(function(a,b){return (b.date||'').localeCompare(a.date||'');});
+  var total=0;log.forEach(function(e){total+=(e.packs||0);});
+  var today=new Date().toISOString().slice(0,10);
+  var html='<div class="pl-add">'+
+    '<input type="date" id="pl-date" value="'+today+'" class="pl-input">'+
+    '<input type="number" id="pl-qty" inputmode="numeric" min="1" placeholder="# packs" class="pl-input pl-qty">'+
+    '<button class="pl-addbtn" onclick="addPackEntry()">Add</button></div>'+
+    '<div class="pl-total">'+total+' packs logged across '+log.length+' session'+(log.length===1?'':'s')+'</div>';
+  if(log.length){
+    html+='<div class="pl-list">';
+    log.forEach(function(e){
+      // find the original index in state.packLog for editing
+      html+='<div class="pl-row"><span class="pl-rdate">'+e.date+'</span>'+
+        '<span class="pl-rqty">'+e.packs+' pack'+(e.packs===1?'':'s')+'</span>'+
+        '<button class="pl-del" onclick="delPackEntry(\''+e.date+'\','+e.packs+')">&times;</button></div>';
+    });
+    html+='</div>';
+  }else{
+    html+='<div class="cmp-empty">No sessions yet. Add one above. Logging packs replaces the estimate with your real total.</div>';
+  }
+  cu.innerHTML=html;
+}
+function addPackEntry(){
+  var d=document.getElementById('pl-date').value;
+  var q=parseInt(document.getElementById('pl-qty').value,10);
+  if(!d){flash('Pick a date');return;}
+  if(!q||q<1){flash('Enter how many packs');return;}
+  if(!state.packLog)state.packLog=[];
+  // merge into same date if exists
+  var found=false;
+  for(var i=0;i<state.packLog.length;i++){if(state.packLog[i].date===d){state.packLog[i].packs+=q;found=true;break;}}
+  if(!found)state.packLog.push({date:d,packs:q});
+  saveState();renderPackLog();flash('Logged '+q+' pack'+(q===1?'':'s'));
+}
+function delPackEntry(date,packs){
+  if(!state.packLog)return;
+  for(var i=0;i<state.packLog.length;i++){
+    if(state.packLog[i].date===date&&state.packLog[i].packs===packs){state.packLog.splice(i,1);break;}
+  }
+  saveState();renderPackLog();
+}
 function openModal(mode){
   var t=document.getElementById('modal-title'),d=document.getElementById('modal-desc'),
       ta=document.getElementById('modal-text'),ac=document.getElementById('modal-actions'),
@@ -1015,7 +1479,30 @@ function openModal(mode){
   cu.innerHTML='';cu.style.display='none';
   ta.style.display='block';
   d.style.display='';ac.style.display='';
-  if(mode==='export'){
+  if(mode==='stats'){
+    t.textContent='xG · Collection stats';
+    d.style.display='none';
+    ta.style.display='none';
+    cu.style.display='block';
+    renderStats();
+    ac.innerHTML='<button class="b-ghost" onclick="closeModal()">Done</button>';
+  }else if(mode==='packlog'){
+    t.textContent='Pack log';
+    d.textContent='Log your pack-opening sessions by date. Your logged total replaces the estimate in stats.';
+    ta.style.display='none';
+    cu.style.display='block';
+    renderPackLog();
+    ac.innerHTML='<button class="b-ghost" onclick="openModal(\'stats\')">Back to stats</button>'+
+                 '<button class="b-ghost" onclick="closeModal()">Done</button>';
+  }else if(mode==='tradehistory'){
+    t.textContent='Trade history';
+    d.textContent='Every completed trade. Reverse any one to undo it and restore your collection.';
+    ta.style.display='none';
+    cu.style.display='block';
+    renderTradeHistory();
+    ac.innerHTML='<button class="b-ghost" onclick="openModal(\'stats\')">Back to stats</button>'+
+                 '<button class="b-ghost" onclick="closeModal()">Done</button>';
+  }else if(mode==='export'){
     t.textContent='Backup & data';
     d.textContent='Save a full backup, restore one, or get a text list to post. Your data lives on this device, so back up now and then.';
     ta.value=JSON.stringify(state);ta.readOnly=true;
@@ -1581,30 +2068,70 @@ function commitTrade(){
   });
   // record an undoable log entry
   state.log=state.log||[];
-  state.log.push({t:'trade',recv:recv.slice(),give:give.slice(),when:Date.now()});
+  state.log.push({t:'trade',id:Date.now()+'_'+Math.floor(Math.random()*1000),recv:recv.slice(),give:give.slice(),when:Date.now()});
   saveState();renderAll();
   closeModal();
   flash('Trade done: '+summary.recv.length+' in'+(summary.give.length?(', '+summary.give.length+' out'):'')+'. Tap to undo.',function(){undoLastTrade();});
 }
-function undoLastTrade(){
-  if(!state.log||!state.log.length)return;
-  var last=state.log[state.log.length-1];if(last.t!=='trade')return;
+function reverseTrade(entry){
   // reverse received
-  last.recv.forEach(function(key){
+  entry.recv.forEach(function(key){
     var p=key.split('|');var c=p[0];var v=(c==='CC')?p[1]:parseInt(p[1],10);
     if(state.have[c])removeOne(state.have[c],v);
-    // also remove if it was added as a spare
     if(state.dupes[c])removeOne(state.dupes[c],v);
     if(!state.wants[c])state.wants[c]=[];
-    if(!inList(state.wants[c],v))state.wants[c].push(v); // put back on want list
+    if(!inList(state.wants[c],v))state.wants[c].push(v);
   });
   // reverse given
-  last.give.forEach(function(key){
+  entry.give.forEach(function(key){
     var p=key.split('|');var c=p[0];var v=(c==='CC')?p[1]:parseInt(p[1],10);
     if(state.given&&state.given[c]&&state.given[c][v]){state.given[c][v]--;if(state.given[c][v]<=0)delete state.given[c][v];}
   });
+}
+function undoLastTrade(){
+  if(!state.log||!state.log.length)return;
+  var last=state.log[state.log.length-1];if(last.t!=='trade')return;
+  reverseTrade(last);
   state.log.pop();saveState();renderAll();flash('Trade undone');
 }
+function reverseTradeById(id){
+  if(!state.log)return;
+  var idx=-1;
+  for(var i=0;i<state.log.length;i++){ if(state.log[i].t==='trade'&&state.log[i].id===id){idx=i;break;} }
+  if(idx<0)return;
+  reverseTrade(state.log[idx]);
+  state.log.splice(idx,1);
+  saveState();renderAll();renderTradeHistory();flash('Trade reversed');
+}
+function tradeHistoryEntries(){
+  return (state.log||[]).filter(function(e){return e.t==='trade';}).slice().reverse();
+}
+function renderTradeHistory(){
+  var cu=document.getElementById('modal-custom');if(!cu)return;
+  var entries=tradeHistoryEntries();
+  if(!entries.length){
+    cu.innerHTML='<div class="cmp-empty">No trades yet. When you complete a trade through Compare or QR Trade, it shows up here so you can review or reverse it.</div>';
+    return;
+  }
+  var html='<div class="th-list">';
+  entries.forEach(function(e){
+    var d=new Date(e.when||0);
+    var dateStr=isNaN(d.getTime())?'':(d.toLocaleDateString(undefined,{month:'short',day:'numeric'})+' '+d.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'}));
+    function chips(arr,cls){
+      if(!arr||!arr.length)return '<span class="th-none">none</span>';
+      return arr.map(function(k){var p=k.split('|');var lab=(p[0]==='CC')?p[1]:(p[0]+' '+p[1]);return '<span class="th-chip '+cls+'">'+lab+'</span>';}).join('');
+    }
+    html+='<div class="th-row">'+
+      '<div class="th-top"><span class="th-date">'+dateStr+'</span>'+
+        '<button class="th-undo" onclick="reverseTradeById(\''+e.id+'\')">Reverse</button></div>'+
+      '<div class="th-side"><span class="th-lbl in">In</span>'+chips(e.recv,'in')+'</div>'+
+      (e.give&&e.give.length?('<div class="th-side"><span class="th-lbl out">Out</span>'+chips(e.give,'out')+'</div>'):'')+
+      '</div>';
+  });
+  html+='</div>';
+  cu.innerHTML=html;
+}
+function openModalReplaced_placeholder(){}
 
 function copyExport(){
   var ta=document.getElementById('modal-text');
