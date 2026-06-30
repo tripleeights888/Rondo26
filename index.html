@@ -444,7 +444,7 @@
   <button class="bulk-cancel" onclick="exitSelectMode()">Done</button>
 </div>
 
-<footer>Tap a sticker for a verdict and action. Trade marks a dupe as traded; Got it moves a want into your collection. Export often so you do not lose changes.<br><br><span class="disclaimer">Rondo is an unofficial fan-made tracker. Not affiliated with or endorsed by Panini or FIFA. All trademarks belong to their respective owners.</span><br><span class="version">rondo-2026.06.24-035414</span></footer>
+<footer>Tap a sticker for a verdict and action. Trade marks a dupe as traded; Got it moves a want into your collection. Export often so you do not lose changes.<br><br><span class="disclaimer">Rondo is an unofficial fan-made tracker. Not affiliated with or endorsed by Panini or FIFA. All trademarks belong to their respective owners.</span><br><span class="version">rondo-2026.06.30-181552</span></footer>
 
 <div class="modal" id="modal">
   <div class="modal-card">
@@ -531,15 +531,13 @@ var ORDERED_CODES=[];
   }
 })();
 // Special non-team groups shown last, in album order.
-var SPECIAL_ORDER=['INTRO','MUSEUM','CC','LOGO'];
+var SPECIAL_ORDER=['FWC','CC'];
 function groupOf(code){return CODE_GROUP[code]||null;}
 
 // Full album: every team has stickers 1..20. Specials have their own ranges.
 function fullSetFor(code){
-  if(code==='INTRO')return [1,2,3,4,5,6,7,8];
-  if(code==='MUSEUM')return [9,10,11,12,13,14,15,16,17,18,19];
+  if(code==='FWC')return ['00',1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19];
   if(code==='CC')return ['CC1','CC2','CC3','CC4','CC5','CC6','CC7','CC8','CC9','CC10','CC11','CC12'];
-  if(code==='LOGO')return ['00'];
   var a=[];for(var i=1;i<=20;i++)a.push(i);return a;
 }
 
@@ -560,10 +558,7 @@ function saveState(){
 }
 
 function nameFor(code,num){
-  if(code==='INTRO')return INTRO_NAMES[num]||'';
-  if(code==='MUSEUM')return MUSEUM_NAMES[num]||'';
   if(code==='CC')return 'Coca-Cola card';
-  if(code==='LOGO')return 'Panini Logo';
   if(NAMES[code]&&NAMES[code][num])return NAMES[code][num];
   return '';
 }
@@ -666,7 +661,7 @@ function teamBlockHTML(code,items,kind){
     pctTag='<span class="team-pct">'+pct+'%</span>';
   }
   var starBtn='';
-  if(['INTRO','MUSEUM','CC','LOGO'].indexOf(code)===-1){
+  if(['FWC','CC'].indexOf(code)===-1){
     starBtn='<button class="favbtn'+(isFav(code)?' on':'')+'" onclick="event.stopPropagation();toggleFav(\''+code+'\')" aria-label="Favorite">'+(isFav(code)?'★':'☆')+'</button>';
   }
   return '<div class="team'+(isFav(code)?' isfav':'')+'" data-code="'+code+'"><div class="team-head">'+
@@ -733,7 +728,7 @@ function renderPanel(kind){
             '<span class="grp-teams">'+names+'</span></div>'+grpProg+blocks;
     }
   }
-  // Special sections (INTRO, MUSEUM, CC, LOGO) after the groups.
+  // Special sections (FWC intro/museum group, and Coca-Cola) after the groups.
   var specialBlocks='';
   for(var si=0;si<SPECIAL_ORDER.length;si++){
     var sc=SPECIAL_ORDER[si];
@@ -742,7 +737,7 @@ function renderPanel(kind){
   if(specialBlocks){
     any=true;
     html+='<div class="grp-head"><span class="grp-letter">Specials</span>'+
-          '<span class="grp-teams">Intro · Museum · Coca-Cola</span></div>'+specialBlocks;
+          '<span class="grp-teams">World Cup · Coca-Cola</span></div>'+specialBlocks;
   }
   if(!any)html+='<div class="empty">Nothing here yet.</div>';
   document.getElementById('panel-'+kind).innerHTML=html;
@@ -999,7 +994,7 @@ function clearSearch(){
 function isKnownCode(c){
   if(!c)return false;
   if(NAMES[c])return true;
-  if(['INTRO','MUSEUM','CC','LOGO'].indexOf(c)>-1)return true;
+  if(['FWC','CC'].indexOf(c)>-1)return true;
   return false;
 }
 function lookup(q){
@@ -1612,8 +1607,8 @@ function quickAdd(){
   var code=p.code,val=p.val;
   // Validate it is a real sticker in the album.
   var full=fullSetFor(code);
-  var valid=inList(full,val) || (code!=='CC' && typeof val==='number' && val>=1 && val<=20 && (NAMES[code]||['INTRO','MUSEUM','LOGO'].indexOf(code)>-1));
-  if(!NAMES[code] && ['INTRO','MUSEUM','CC','LOGO'].indexOf(code)===-1){
+  var valid=inList(full,val) || (code!=='CC' && typeof val==='number' && val>=1 && val<=20 && (NAMES[code]||['FWC'].indexOf(code)>-1));
+  if(!NAMES[code] && ['FWC','CC'].indexOf(code)===-1){
     fb.innerHTML='<div class="qa-card bad"><span class="qwho">Unknown team code</span>'+
       '<span class="qwhat">'+code+'</span><span class="qdetail">That is not a team in this album.</span></div>';return;
   }
@@ -1661,8 +1656,8 @@ function qaTeamEcho(){
   if(!ti||!out)return;
   var code=(ti.value||'').trim().toUpperCase();
   if(!code){out.textContent='';out.className='qa-teamname';return;}
-  if(NAMES[code]||['INTRO','MUSEUM','CC','LOGO'].indexOf(code)>-1){
-    var label=({INTRO:'Intro',MUSEUM:'Museum',CC:'Coca-Cola',LOGO:'Logo'})[code]||teamFullName(code);
+  if(NAMES[code]||['FWC','CC'].indexOf(code)>-1){
+    var label=({FWC:'World Cup',CC:'Coca-Cola'})[code]||teamFullName(code);
     out.textContent='✓ '+label;out.className='qa-teamname ok';
   }else{
     out.textContent='not a team code';out.className='qa-teamname bad';
@@ -1671,7 +1666,7 @@ function qaTeamEcho(){
 function teamFullName(code){
   // derive a readable country name from the team-photo or any player suffix is hard;
   // use the group member display. Fall back to the code.
-  var map={MEX:'Mexico',RSA:'South Africa',KOR:'South Korea',CZE:'Czechia',CAN:'Canada',SUI:'Switzerland',QAT:'Qatar',BIH:'Bosnia',BRA:'Brazil',MAR:'Morocco',HAI:'Haiti',SCO:'Scotland',USA:'USA',PAR:'Paraguay',AUS:'Australia',TUR:'Türkiye',GER:'Germany',CUW:'Curaçao',CIV:'Ivory Coast',ECU:'Ecuador',NED:'Netherlands',JPN:'Japan',TUN:'Tunisia',SWE:'Sweden',BEL:'Belgium',EGY:'Egypt',IRN:'Iran',NZL:'New Zealand',ESP:'Spain',CPV:'Cape Verde',KSA:'Saudi Arabia',URU:'Uruguay',FRA:'France',SEN:'Senegal',NOR:'Norway',IRQ:'Iraq',ARG:'Argentina',ALG:'Algeria',AUT:'Austria',JOR:'Jordan',POR:'Portugal',COD:'Congo DR',UZB:'Uzbekistan',COL:'Colombia',ENG:'England',CRO:'Croatia',GHA:'Ghana',PAN:'Panama'};
+  var map={FWC:'World Cup',CC:'Coca-Cola',MEX:'Mexico',RSA:'South Africa',KOR:'South Korea',CZE:'Czechia',CAN:'Canada',SUI:'Switzerland',QAT:'Qatar',BIH:'Bosnia',BRA:'Brazil',MAR:'Morocco',HAI:'Haiti',SCO:'Scotland',USA:'USA',PAR:'Paraguay',AUS:'Australia',TUR:'Türkiye',GER:'Germany',CUW:'Curaçao',CIV:'Ivory Coast',ECU:'Ecuador',NED:'Netherlands',JPN:'Japan',TUN:'Tunisia',SWE:'Sweden',BEL:'Belgium',EGY:'Egypt',IRN:'Iran',NZL:'New Zealand',ESP:'Spain',CPV:'Cape Verde',KSA:'Saudi Arabia',URU:'Uruguay',FRA:'France',SEN:'Senegal',NOR:'Norway',IRQ:'Iraq',ARG:'Argentina',ALG:'Algeria',AUT:'Austria',JOR:'Jordan',POR:'Portugal',COD:'Congo DR',UZB:'Uzbekistan',COL:'Colombia',ENG:'England',CRO:'Croatia',GHA:'Ghana',PAN:'Panama'};
   return map[code]||code;
 }
 // Add one sticker; returns 'new' | 'dupe' | 'badrange'. Updates state but does NOT save/render.
@@ -1704,8 +1699,8 @@ function qaTeamEcho(){
   // changing the team resets the current pile
   qaPile={};qaColorPick=null;
   if(!code){out.textContent='';out.className='qa-teamname';renderQaGrid();renderQaCommit();return;}
-  if(NAMES[code]||['INTRO','MUSEUM','CC','LOGO'].indexOf(code)>-1){
-    var label=({INTRO:'Intro',MUSEUM:'Museum',CC:'Coca-Cola',LOGO:'Logo'})[code]||teamFullName(code);
+  if(NAMES[code]||['FWC','CC'].indexOf(code)>-1){
+    var label=({FWC:'World Cup',CC:'Coca-Cola'})[code]||teamFullName(code);
     out.textContent='✓ '+label;out.className='qa-teamname ok';
   }else{
     out.textContent='not a team code';out.className='qa-teamname bad';
@@ -1746,7 +1741,7 @@ function qaPickColor(valStr,copyIdx,colorKey,ev){
 function renderQaGrid(){
   var grid=document.getElementById('qa-grid');if(!grid)return;
   var code=qaCurrentCode();
-  if(!code||(!NAMES[code]&&['INTRO','MUSEUM','CC','LOGO'].indexOf(code)===-1)){
+  if(!code||(!NAMES[code]&&['FWC','CC'].indexOf(code)===-1)){
     grid.innerHTML='<div class="qa-grid-hint">Enter a team code above to show its stickers.</div>';
     return;
   }
@@ -1812,7 +1807,7 @@ function quickAddBatch(){
   var fb=document.getElementById('qa-feedback');
   var code=(ti.value||'').trim().toUpperCase();
   if(!code){fb.innerHTML=qaCard('bad','Pick a team first','','Type a team code like KOR.');return;}
-  if(!NAMES[code] && ['INTRO','MUSEUM','CC','LOGO'].indexOf(code)===-1){
+  if(!NAMES[code] && ['FWC','CC'].indexOf(code)===-1){
     fb.innerHTML=qaCard('bad','Unknown team code',code,'That is not a team in this album.');return;
   }
   // expand qaPile into individual stickers (one token per copy, each with its colour)
@@ -1872,11 +1867,12 @@ function parseList(text){
     var rest=cleaned;
     if(cm){curCode=cm[1];rest=cleaned.slice(cm[1].length);}
     if(!curCode)continue;
-    // collect numbers (also handle CC tokens)
-    var tokens=rest.match(/CC\d+|\d+/g)||[];
+    // collect numbers (also handle CC tokens and the FWC "00" logo)
+    var tokens=rest.match(/CC\d+|00|\d+/g)||[];
     for(var k=0;k<tokens.length;k++){
       var tk=tokens[k];
       if(curCode==='CC'||/^CC/.test(tk))out['CC']=(out['CC']||[]).concat(['CC'+tk.replace(/\D/g,'')]);
+      else if(tk==='00'){ if(!out[curCode])out[curCode]=[]; if(!inList(out[curCode],'00'))out[curCode].push('00'); }
       else{ if(!out[curCode])out[curCode]=[]; var n=parseInt(tk,10); if(!inList(out[curCode],n))out[curCode].push(n); }
     }
   }
@@ -2288,7 +2284,7 @@ function buildTextList(data,kind){
       // tally minus given; expand remaining copies; show xN for multiples
       var m=tally(items);
       var parts=[];
-      var keys=Object.keys(m).map(function(k){return (/^CC/.test(k))?k:parseInt(k,10);}).sort(function(a,b){var na=(typeof a==='string')?999:a,nb=(typeof b==='string')?999:b;return na-nb;});
+      var keys=Object.keys(m).map(function(k){return (/^CC/.test(k)||k==='00')?k:parseInt(k,10);}).sort(function(a,b){var na=(typeof a==='string')?(a==='00'?-1:999):a,nb=(typeof b==='string')?(b==='00'?-1:999):b;return na-nb;});
       for(var i=0;i<keys.length;i++){
         var v=keys[i];
         var avail=m[v]-givenCount(code,v);
@@ -2298,7 +2294,7 @@ function buildTextList(data,kind){
       if(!parts.length)return;
       nums=parts.join(', ');
     }else{
-      var arr=items.slice().sort(function(a,b){var na=(typeof a==='string')?999:a,nb=(typeof b==='string')?999:b;return na-nb;});
+      var arr=items.slice().sort(function(a,b){var na=(typeof a==='string')?(a==='00'?-1:999):a,nb=(typeof b==='string')?(b==='00'?-1:999):b;return na-nb;});
       nums=arr.join(', ');
     }
     lines.push(label+': '+nums);
@@ -2308,8 +2304,8 @@ function buildTextList(data,kind){
     var L=GROUP_ORDER[gi];var members=GROUPS[L];
     for(var mi=0;mi<members.length;mi++){emit(members[mi],members[mi]);}
   }
-  // specials
-  emit('INTRO','INTRO');emit('MUSEUM','MUSEUM');emit('CC','CC');emit('LOGO','LOGO');
+  // specials (the World Cup intro/museum group is stored under FWC; Coca-Cola under CC)
+  emit('FWC','FWC');emit('CC','CC');
   // count
   var total=0;
   for(var c in data){
